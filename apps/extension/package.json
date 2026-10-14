@@ -1,0 +1,25 @@
+{
+  "name": "@geminihall/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "typecheck": "wxt prepare && tsc -p tsconfig.json",
+    "test": "vitest run",
+    "e2e": "wxt build && node e2e/run.mjs"
+  },
+  "dependencies": {
+    "@geminihall/audit-core": "workspace:*",
+    "@geminihall/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.5",
+    "playwright": "~1.63.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0",
+    "wxt": "~0.21.4"
+  }
+}

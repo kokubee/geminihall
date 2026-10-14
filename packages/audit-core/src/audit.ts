@@ -6,13 +6,9 @@ import { claimCacheKey, contextFingerprint, normalizeText, normalizeUrl } from "
 import { openaiAdapter } from "./openai";
 import { AUDIT_SYSTEM_PROMPT, buildUserMessage } from "./prompt";
 import type { ProviderAdapter } from "./provider";
+export { DEFAULT_MODELS } from "./models";
 
 export const AUDIT_POLICY_VERSION = "2026-10-15.2";
-
-export const DEFAULT_MODELS: Record<Provider, string> = {
-  ANTHROPIC: "claude-opus-5-5",
-  OPENAI: "gpt-6-astra",
-};
 
 const ADAPTERS: Record<Provider, ProviderAdapter> = {
   ANTHROPIC: anthropicAdapter,
