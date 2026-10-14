@@ -8,12 +8,13 @@
     "build": "tsc -p tsconfig.json && vite build",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
-    "e2e": "node e2e/run.mjs"
+    "e2e": "node e2e/run.mjs && node e2e/admin.mjs"
   },
   "dependencies": {
     "@geminihall/schema": "workspace:*"
   },
   "devDependencies": {
+    "@types/node": "^24.19.2",
     "typescript": "^5.9.3",
     "vite": "~8.3.4",
     "vitest": "^4.1.0"

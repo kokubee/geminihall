@@ -33,6 +33,7 @@ await check("一覧: 公開済みだけが表示され、撤回済みは出な�
 await check("絞り込み: カテゴリで一覧が絞られ、選択中のチップが示される", async () => {
   await page.click('a.chip[href="/?category=Chronological_Error"]');
   await page.waitForFunction(() => document.querySelector(".chip-active")?.textContent === "年代・日付の誤り");
+  await page.waitForSelector(".card-title");
   const titles = await page.$$eval(".card-title", (els) => els.map((e) => e.textContent));
   assert.ok(titles.length >= 1 && titles.every((t) => t.includes("取り違え")));
 });

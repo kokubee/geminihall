@@ -270,6 +270,9 @@ export function createApp(verifyAdmin: AdminVerifier, clock: () => number = Date
   });
 
   app.use("/api/admin/*", async (c, next) => {
+    if (c.req.method !== "GET" && c.req.header("X-GeminiHall-Admin") !== "1") {
+      return c.json(errorBody("UNAUTHORIZED_REQUEST_ACCESS", "管理画面以外からの操作は受け付けません。"), 403);
+    }
     const reviewer = await verifyAdmin(c.req.raw, c.env);
     if (!reviewer) return c.json(errorBody("UNAUTHORIZED_REQUEST_ACCESS", "管理者として認証されていません。"), 403);
     c.set("reviewerId", reviewer);
@@ -289,6 +292,8 @@ export function createApp(verifyAdmin: AdminVerifier, clock: () => number = Date
       .all();
     return c.json({ submissions: results });
   });
+
+  app.get("/api/admin/me", (c) => c.json({ reviewer: c.get("reviewerId") }));
 
   app.get("/api/admin/submissions/:id", async (c) => {
     const row = await c.env.DB.prepare("SELECT * FROM submissions WHERE submission_id = ?")

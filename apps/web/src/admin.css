@@ -1,0 +1,20 @@
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 16px; }
+.table { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.table th, .table td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--border); vertical-align: top; }
+.table th { font-size: 12px; color: var(--muted); border-top: 0; }
+.table td a { word-break: break-all; }
+.form { display: grid; gap: 10px; }
+.form label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.form input, .form textarea { font: inherit; font-size: 15px; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; width: 100%; }
+.form textarea { resize: vertical; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { font: inherit; font-size: 14px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 700; }
+.btn-danger { background: var(--confirmed-bg); color: var(--confirmed-fg); border-color: transparent; font-weight: 700; }
+.btn:disabled { opacity: 0.5; cursor: progress; }
+.error-box { background: var(--confirmed-bg); color: var(--confirmed-fg); border-radius: 10px; padding: 10px 14px; }
+.ok-box { background: var(--supported-bg); color: var(--supported-fg); border-radius: 10px; padding: 10px 14px; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 13px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+@media (max-width: 560px) { .table .hide-sm { display: none; } .kv { grid-template-columns: 1fr; } }

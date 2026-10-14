@@ -20,7 +20,12 @@ export function call(path: string, init: RequestInit = {}) {
 }
 
 export function postJson(path: string, body: unknown, headers: Record<string, string> = {}) {
-  return call(path, { method: "POST", headers: { "content-type": "application/json", ...headers }, body: JSON.stringify(body) });
+  const adminHeader: Record<string, string> = path.startsWith("/api/admin/") ? { "X-GeminiHall-Admin": "1" } : {};
+  return call(path, {
+    method: "POST",
+    headers: { "content-type": "application/json", ...adminHeader, ...headers },
+    body: JSON.stringify(body),
+  });
 }
 
 export async function buildResult(claim: string, overrides: Partial<AuditResult> = {}): Promise<AuditResult> {
