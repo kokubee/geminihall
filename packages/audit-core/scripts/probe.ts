@@ -1,3 +1,4 @@
+import { writeFileSync } from "node:fs";
 import { DEFAULT_MODELS, runAudit } from "../src/index";
 import type { Provider } from "@geminihall/schema";
 
@@ -21,6 +22,8 @@ try {
     input: { claim, locale: "ja" },
   });
   const r = out.result;
+  const outPath = process.argv[5];
+  if (outPath) writeFileSync(outPath, `${JSON.stringify({ claim, result: r }, null, 2)}\n`);
   console.log(
     JSON.stringify(
       {

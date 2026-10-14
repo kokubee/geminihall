@@ -6,6 +6,8 @@ export const DEFAULT_SETTINGS: Settings = {
   provider: "ANTHROPIC",
   models: { ...DEFAULT_MODELS },
   costNoticeAccepted: false,
+  publicLookup: true,
+  demoMode: false,
 };
 
 export async function loadSettings(): Promise<Settings> {
@@ -15,6 +17,8 @@ export async function loadSettings(): Promise<Settings> {
     provider: s?.provider === "OPENAI" ? "OPENAI" : "ANTHROPIC",
     models: { ...DEFAULT_SETTINGS.models, ...(s?.models ?? {}) },
     costNoticeAccepted: s?.costNoticeAccepted === true,
+    publicLookup: s?.publicLookup !== false,
+    demoMode: s?.demoMode === true,
   };
 }
 

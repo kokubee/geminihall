@@ -9,7 +9,7 @@
   <body>
     <header class="app-header">
       <h1>GeminiHall</h1>
-      <span id="mode-badge" class="badge badge-live">LIVE</span>
+      <label class="demo-toggle"><input id="demo-mode" type="checkbox" /> <span id="mode-badge" class="badge">LIVE</span></label>
     </header>
 
     <details id="settings" class="panel">
@@ -31,6 +31,10 @@
           <input id="api-key" type="password" spellcheck="false" placeholder="未設定" />
         </label>
         <p id="key-status" class="hint"></p>
+        <label class="check">
+          <input id="public-lookup" type="checkbox" />
+          <span>AIを呼ぶ前に、公開辞典に同じ事例がないか照会する（送るのは主張のハッシュ値だけです）</span>
+        </label>
         <p class="hint">
           キーはこのブラウザのセッション内だけに保存し、GeminiHall のサーバーへは送りません。ブラウザを閉じると消えるため、再起動後はもう一度入力してください。監査の利用料は、あなたのアカウントに請求されます。
         </p>
@@ -50,12 +54,16 @@
         <span>文脈（任意）</span>
         <textarea id="context" rows="2" maxlength="2000" placeholder="質問の内容など、主張の前提になる情報"></textarea>
       </label>
-      <button id="run" class="primary">監査する</button>
+      <div class="row">
+        <button id="run" class="primary">監査する</button>
+        <button id="rerun" hidden>もう一度監査する</button>
+      </div>
       <p id="input-error" class="error" hidden></p>
     </section>
 
     <section id="status" class="panel" hidden></section>
     <section id="result" hidden></section>
+    <section id="submission" class="panel" hidden></section>
 
     <script type="module" src="./main.ts"></script>
   </body>

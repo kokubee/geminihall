@@ -138,3 +138,12 @@ blockquote { margin: 4px 0 0; padding-left: 8px; border-left: 3px solid var(--bo
 .meta { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 12px; }
 .meta dt { color: var(--muted); }
 .meta dd { margin: 0; }
+
+.badge-demo { background: var(--unverified-bg); color: var(--unverified-fg); border-color: transparent; }
+.demo-toggle { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; cursor: pointer; }
+.demo-toggle input { width: auto; }
+.check { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; margin: 6px 0 10px; }
+.check input { width: auto; margin-top: 3px; }
+.notice-info { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+.notice-demo { font-weight: 600; }
+.entry-title { font-size: 15px; margin: 0 0 8px; }

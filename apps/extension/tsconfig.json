@@ -3,7 +3,21 @@
   "compilerOptions": {
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "chrome",
+      "node"
+    ]
   },
-  "include": [".wxt/wxt.d.ts", "entrypoints", "lib", "test", "wxt.config.ts"]
+  "include": [
+    ".wxt/wxt.d.ts",
+    "entrypoints",
+    "lib",
+    "test",
+    "wxt.config.ts"
+  ]
 }

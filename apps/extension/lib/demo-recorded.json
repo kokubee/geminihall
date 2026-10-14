@@ -1,0 +1,61 @@
+{
+  "claim": "日本国憲法は1950年5月3日に施行され、同じ日に国会が初めて召集された。",
+  "result": {
+    "request_id": "c49a07da-7f7a-497e-8165-33af32646131",
+    "mode": "LIVE",
+    "auditor": {
+      "provider": "ANTHROPIC",
+      "model": "claude-opus-5-5"
+    },
+    "is_valid_input": true,
+    "contains_pii": false,
+    "audit_status": "CONFIRMED_HALLUCINATION",
+    "evidence_status": "VERIFIED",
+    "severity_score": 4,
+    "category": "Chronological_Error",
+    "ttl_category": "HISTORICAL_FACT",
+    "verified_at": "2026-10-14T16:30:05.396Z",
+    "expires_at": "2026-11-13T16:30:05.396Z",
+    "evidence_checked_at": "2026-10-14T16:30:05.396Z",
+    "normalized_claim": "日本国憲法は1950年5月3日に施行され、同じ日に国会が初めて召集された。",
+    "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+    "audit_trace": {
+      "decomposed_claims": [
+        {
+          "sub_claim": "日本国憲法は1950年5月3日に施行された",
+          "verification_target": "国立公文書館のデジタル展示「再建日本の出発 1947年5月 日本国憲法の施行」",
+          "status": "CONTRADICTED"
+        },
+        {
+          "sub_claim": "日本国憲法の施行と同じ日に国会が初めて召集された",
+          "verification_target": "第1回国会の召集日(第1回国会の記録)",
+          "status": "CONTRADICTED"
+        }
+      ],
+      "alignment_reasoning": "国立公文書館の資料によると、日本国憲法の施行日は昭和22年(1947年)5月3日です。主張の「1950年」は誤りです。また、取得した第1回国会の記事によると、第1回国会(特別会)は1947年5月20日から同年12月9日まで開かれました。憲法施行日の5月3日と同じ日に初めて召集されたという主張も、取得した資料と矛盾します。",
+      "abstention_reason": null
+    },
+    "hallucinated_claim": "日本国憲法は1950年5月3日に施行され、同じ日に国会が初めて召集された。",
+    "correction": "日本国憲法の施行日は1947年(昭和22年)5月3日です。日本国憲法の下での最初の国会(第1回国会、特別会)は、施行日と同じ日ではなく、1947年5月20日に開会しました。",
+    "unverified_notes": null,
+    "evidence_sources": [
+      {
+        "title": "INDEX|再建日本の出発−1947年5月 日本国憲法の施行−",
+        "url": "https://www.archives.go.jp/exhibition/digital/saiken/shousai.html",
+        "snippet": "昭和22年(1947)5月3日、新しい日本国憲法が施行されました。",
+        "verified": true
+      },
+      {
+        "title": "第1回国会",
+        "url": "https://ja.wikipedia.org/wiki/%E7%AC%AC1%E5%9B%9E%E5%9B%BD%E4%BC%9A",
+        "snippet": "第1回国会とは、1947年(昭和22年)5月20日から同年12月9日まで開会された、日本の国会の特別会である。",
+        "verified": true
+      }
+    ],
+    "estimated_error_pattern": "施行年を1947年から1950年に取り違えたうえで、憲法施行日と第1回国会の開会日(5月20日)を同じ日だと混同した可能性があります。",
+    "limitations": [
+      "第1回国会の日付は、衆議院・参議院の公式記録ではなくWikipediaで確認しました。",
+      "「召集日」と「開会日」の区別までは、一次資料で個別に確認していません。"
+    ]
+  }
+}

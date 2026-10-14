@@ -1,5 +1,54 @@
-import type { AuditResult } from "@geminihall/schema";
-import type { AuditJob } from "./state";
+import type { AuditResult, AuditTrace, EvidenceSource } from "@geminihall/schema";
+import type { AuditJob, JobSource, PublicEntry } from "./state";
+
+export interface ResultView {
+  audit_status: AuditResult["audit_status"];
+  evidence_status: AuditResult["evidence_status"] | null;
+  severity_score: number | null;
+  hallucinated_claim: string | null;
+  correction: string | null;
+  unverified_notes: string | null;
+  audit_trace: AuditTrace;
+  evidence_sources: EvidenceSource[];
+  limitations: string[];
+  auditor: AuditResult["auditor"];
+  verified_at: string;
+  expires_at: string;
+  ttl_category: AuditResult["ttl_category"];
+  contains_pii: boolean;
+  title: string | null;
+}
+
+export function viewFromResult(r: AuditResult): ResultView {
+  return { ...r, title: null };
+}
+
+export function viewFromEntry(e: PublicEntry): ResultView {
+  return {
+    audit_status: e.audit_status,
+    evidence_status: null,
+    severity_score: e.severity_score,
+    hallucinated_claim: null,
+    correction: e.correction,
+    unverified_notes: null,
+    audit_trace: e.audit_trace,
+    evidence_sources: e.evidence_sources,
+    limitations: e.limitations,
+    auditor: e.auditor,
+    verified_at: e.verified_at,
+    expires_at: e.expires_at,
+    ttl_category: e.ttl_category,
+    contains_pii: false,
+    title: e.sanitized_title,
+  };
+}
+
+const SOURCE_NOTE: Record<JobSource, string | null> = {
+  LIVE: null,
+  PRIVATE_CACHE: "このブラウザで以前に行った監査の結果を再利用しています（AIは呼んでいません）。最新の状態で確かめたい場合は「もう一度監査する」を押してください。",
+  PUBLIC: "公開辞典に掲載済みの事例を表示しています（AIは呼んでいません）。この事例は利用者のブラウザで作られた監査結果を、管理者が根拠を確認したうえで掲載したものです。",
+  DEMO: "DEMO / Recorded Result：事前に記録した監査結果を表示しています。AIは呼んでおらず、公開申請もできません。",
+};
 
 type Child = Node | string | null | undefined | false;
 
@@ -65,16 +114,18 @@ function step(n: number, title: string, ...body: Child[]): HTMLElement {
   return h("li", { class: "step" }, h("div", { class: "step-title" }, h("span", { class: "step-no" }, String(n)), title), ...body);
 }
 
-export function renderResult(job: AuditJob): HTMLElement {
-  const r = job.result!;
+export function renderResult(job: AuditJob, r: ResultView): HTMLElement {
   const root = h("div", { class: "result" });
+  const note = SOURCE_NOTE[job.source];
+  if (note) root.append(h("p", { class: job.source === "DEMO" ? "notice notice-demo" : "notice notice-info" }, note));
+  if (r.title) root.append(h("h2", { class: "entry-title" }, r.title));
 
   root.append(
     h(
       "div",
       { class: `verdict ${STATUS_CLASS[r.audit_status]}` },
       h("div", { class: "verdict-label" }, STATUS_LABEL[r.audit_status]),
-      h("div", { class: "verdict-sub" }, EVIDENCE_LABEL[r.evidence_status]),
+      r.evidence_status ? h("div", { class: "verdict-sub" }, EVIDENCE_LABEL[r.evidence_status]) : null,
       r.severity_score !== null ? h("div", { class: "verdict-sub" }, `深刻度 ${r.severity_score} / 5`) : null,
     ),
   );
@@ -167,7 +218,13 @@ export function renderResult(job: AuditJob): HTMLElement {
       h("dt", {}, "情報の種類"),
       h("dd", {}, TTL_LABEL[r.ttl_category]),
       h("dt", {}, "有効期限"),
-      h("dd", {}, formatTime(r.expires_at)),
+      h(
+        "dd",
+        {},
+        job.source !== "DEMO" && Date.parse(r.expires_at) <= Date.now()
+          ? `${formatTime(r.expires_at)}（期限切れ・再検証が必要）`
+          : formatTime(r.expires_at),
+      ),
       r.contains_pii ? h("dt", {}, "注意") : null,
       r.contains_pii ? h("dd", {}, "入力に個人情報が含まれている可能性があります。") : null,
     ),
