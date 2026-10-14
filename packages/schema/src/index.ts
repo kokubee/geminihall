@@ -196,6 +196,7 @@ export const ErrorCodeEnum = z.enum([
   "RATE_LIMITED",
   "UPSTREAM_AI_UNAVAILABLE",
   "INTERNAL_AUDIT_SCHEMA_VIOLATION",
+  "INTERNAL_ERROR",
 ]);
 
 export type ErrorCode = z.infer<typeof ErrorCodeEnum>;

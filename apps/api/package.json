@@ -1,0 +1,26 @@
+{
+  "name": "@geminihall/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "db:migrate:local": "wrangler d1 migrations apply geminihall --local",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@geminihall/audit-core": "workspace:*",
+    "@geminihall/schema": "workspace:*",
+    "hono": "~4.13.13",
+    "jose": "~6.2.12",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "~1.4.0",
+    "@cloudflare/workers-types": "^5.20261001.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0",
+    "wrangler": "~4.149.0"
+  }
+}

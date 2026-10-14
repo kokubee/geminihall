@@ -2,36 +2,19 @@ import type { AuditInput, AuditResult, Provider } from "@geminihall/schema";
 import { anthropicAdapter } from "./anthropic";
 import { assembleResult } from "./assemble";
 import { InvalidClaimError, SchemaViolationError } from "./errors";
-import { claimCacheKey, contextFingerprint, normalizeText, normalizeUrl } from "./normalize";
+import { normalizeUrl } from "./normalize";
+import { cacheIdentity } from "./identity";
 import { openaiAdapter } from "./openai";
 import { AUDIT_SYSTEM_PROMPT, buildUserMessage } from "./prompt";
 import type { ProviderAdapter } from "./provider";
-export { DEFAULT_MODELS } from "./models";
 
-export const AUDIT_POLICY_VERSION = "2026-10-15.2";
+export { AUDIT_POLICY_VERSION, cacheIdentity, type CacheIdentity } from "./identity";
+export { DEFAULT_MODELS } from "./models";
 
 const ADAPTERS: Record<Provider, ProviderAdapter> = {
   ANTHROPIC: anthropicAdapter,
   OPENAI: openaiAdapter,
 };
-
-export interface CacheIdentity {
-  normalizedClaim: string;
-  contextFingerprint: string;
-  claimCacheKey: string;
-}
-
-export async function cacheIdentity(input: AuditInput): Promise<CacheIdentity> {
-  const normalizedClaim = normalizeText(input.claim);
-  const fingerprint = await contextFingerprint(input.context);
-  const key = await claimCacheKey({
-    normalizedClaim,
-    contextFingerprint: fingerprint,
-    auditPolicyVersion: AUDIT_POLICY_VERSION,
-    locale: input.locale,
-  });
-  return { normalizedClaim, contextFingerprint: fingerprint, claimCacheKey: key };
-}
 
 export interface RunAuditArgs {
   requestId: string;
