@@ -6,11 +6,11 @@
 
 ## 1. 絶対遵守の実装制約（ハードルール）
 
-1. **Phase順序の厳守**: Phase 0の実機検証と受入テストがすべて完了するまで、LINE連携、キャッシュ処理、公開辞典UIに一切着手してはならない。
-2. **「必須（Must-Have）」の優先**: `SPEC.md` で「余力対応（Vectorize、DOM自動抽出の高度化、ストリーミング）」および「対象外（X自動収集、LLM自動公開承認）」に分類された機能は、必須機能が全件完了するまで実装を禁ずる。
+1. **Phase順序の厳守**: Phase 0の実機検証と受入テストがすべて完了するまで、キャッシュ処理、公開申請・審査API、公開辞典UIに一切着手してはならない。
+2. **「必須（Must-Have）」の優先**: `SPEC.md` で「余力対応（Vectorize、DOM自動抽出の高度化、ストリーミング）」および「対象外（サーバー負担の無料枠、LINE連携、X自動収集、LLM自動公開承認など）」に分類された機能は、必須機能が全件完了するまで実装を禁ずる。
 3. **構造検証（Zod）と事実性評価（Eval）の分離実装**: Zodによるスキーマ検証だけで「監査品質が担保された」とみなしてはならない。必ず `packages/eval` に20件の評価セットと4指標の測定スクリプトを実装し、プロンプトや監査ロジックの変更時に実行すること。
 4. **既存コードの盲目的コピー禁止**: 隣接リポジトリ（`../e-merit`, `../disaster-life-board`, `../gxceed` 等）を参照する際は、必ず事前に該当ファイルをReadして構造を確認し、本プロジェクトの6テーブル構造・初回累計3回クォータ・所有者認可設計に合わせて書き直すこと。
-5. **BYOKキーの絶対隔離**: ユーザーのAnthropic APIキーを `chrome.storage.session` 以外に保存すること、Content Scriptへ渡すこと、Honoサーバーへ転送すること、ログに出力することを固く禁ずる。直接通信が不成立の場合は自動でサーバー中継に切り替えず、BYOK機能を安全に無効化（縮退）せよ。
+5. **BYOKキーの絶対隔離**: 利用者のAPIキー（Anthropic・OpenAI）を `chrome.storage.session` 以外に保存すること、Content Scriptへ渡すこと、GeminiHallのサーバーへ転送すること、ログやエラー報告に出力することを固く禁ずる。直接通信が不成立の場合もサーバー中継に切り替えず、接続失敗を表示して監査を実行しない。
 6. **仕様変更の管理規則**: 実装中に技術的制約等で `SPEC.md` からの仕様変更が必要となった場合は、勝手にコードを書き換えず、まず「変更理由・影響範囲・代替案」を提示して承認を得ること。
 
 ---
@@ -18,7 +18,7 @@
 ## 2. 各Phaseの完了報告フォーマット（虚偽報告の防止）
 
 各Phaseの終了時、エージェントは以下の4項目を必ず出力し、確認を得てから次のPhaseへ進むこと。
-**実行していないテスト（特に実機ブラウザ操作やLINE実機送信が必要なもの）を推測で `PASS` と報告することを厳禁とし、必ず `NOT TESTED` と明記すること。**
+**実行していないテスト（特に実機ブラウザ操作や各社APIへの実接続が必要なもの）を推測で `PASS` と報告することを厳禁とし、必ず `NOT TESTED` と明記すること。**
 
 ```text
 ### Phase X 完了判定レポート
@@ -30,48 +30,41 @@
 
 ---
 
-## 3. 開発マイルストーンと受入テスト条件（2026年11月2日 12:00 〜 11月10日 14:00）
+## 3. 開発マイルストーンと受入テスト条件
 
-> 2026-10-15 追記: ハッカソンへの提出は取りやめた。以下の日付は拘束力を持たないが、Phase の順序と受入テストの条件はそのまま適用する。仕様の補足決定は `SPEC.md` 第6章を参照する。
+> 2026-10-15: ハッカソンへの提出を取りやめ、`SPEC.md` v2（利用者のキーでブラウザ内だけで監査する方式）に合わせて Phase を組み直した。日付は定めない。v1 の Phase 構成はコミット `1d6c92a` を参照。
 
-### 【Phase 0】11月2日（月）12:00 〜 11月3日（火）：Chrome拡張〜Hono〜Claude多段階監査の最小E2E・認可・状態復元
+### 【Phase 0】Chrome拡張での BYOK 監査の最小E2E・状態復元
 * **実装タスク**:
-  * [ ] モノレポ初期化（`apps/api`, `apps/extension`, `apps/web`, `packages/schema`, `packages/eval`）。WXTで2時間以内に疎通しない場合は素のMV3 + Vite + TSへ即時切替。
-  * [ ] `packages/schema`: `SPEC.md` 第4章のZodスキーマ（`audit_trace` 含む）と `.superRefine()` 不変条件テストを実装。
-  * [ ] `apps/api`: D1の6テーブル作成。初回累計3回クォータ管理（`quota_usage` + `audit_requests`）と、所有者認可付き `POST /api/verify`, `GET /api/requests/:id`（要 `X-Client-Token` 検証）を実装。
-  * [ ] `apps/extension`: ユーザージェスチャー起点での `chrome.sidePanel` 起動、手動入力＆右クリック選択テキスト取得、Side Panel上での多段階監査工程（主張の分解・根拠照合・判定保留理由）の表示、`chrome.storage.session` を使った状態復元を実装。
-  * [ ] BYOK直接通信（Background Worker ➔ Anthropic API）の実機検証と、不成立時の縮退動作の実装。
+  * [ ] モノレポ初期化（`apps/extension`, `apps/api`, `apps/web`, `packages/schema`, `packages/audit-core`, `packages/eval`）。WXTで2時間以内に疎通しない場合は素のMV3 + Vite + TSへ即時切替。
+  * [ ] `packages/schema`: `SPEC.md` 第5章のZodスキーマと不変条件テスト。
+  * [ ] `packages/audit-core`: 正規化・キャッシュキー、Claude と OpenAI の監査アダプター、根拠URLの実取得照合、格下げ処理、結果の組み立て。各社 API の応答はテストでは模擬応答を使う。
+  * [ ] `apps/extension`: 設定画面（AIの種類・キー・モデル）、ユーザー操作起点の `chrome.sidePanel` 起動、手動入力＆右クリック選択テキスト取得、Background での監査実行、Side Panel 上の多段階監査工程の表示、`chrome.storage.session` による状態復元。
+  * [ ] 各社 API への直接接続の実機検証（Claude・OpenAI 各1回）。
 * **Phase 0 必須受入テスト**:
   1. 監査開始後にSide Panelを閉じて再度開いた際、完了済みの結果（`audit_trace` 含む）が復元されること。
-  2. 異なる `X-Client-Token`（またはトークンなし）で `GET /api/requests/:id` を叩いた際、`HTTP 403`（`UNAUTHORIZED_REQUEST_ACCESS`）で拒否されること。
-  3. 同一 `request_id` 再送時に無料枠が二重消費されず、4回目の新規リクエストで `QUOTA_EXCEEDED` となること（日付変更でもリセットされないこと）。
-  4. Zod不変条件テスト：`CONFIRMED_HALLUCINATION` かつ `evidence_status: INSUFFICIENT` のデータがバリデーションエラーで弾かれること。また `UNVERIFIED_OR_AMBIGUOUS` 時に `correction` が `null` かつ `audit_trace.abstention_reason` が必須であることが強制されること。
+  2. キーが `chrome.storage.session` 以外（`chrome.storage.local`、Content Script、ネットワーク送信先のうち各社API以外、コンソール出力）に現れないこと。
+  3. 検索ツールが返していない URL を根拠に挙げた `CONFIRMED_HALLUCINATION` が、`UNVERIFIED_OR_AMBIGUOUS` に格下げされること（模擬応答で確認）。
+  4. Zod不変条件テスト：`CONFIRMED_HALLUCINATION` かつ `evidence_status: INSUFFICIENT` のデータが弾かれること。`UNVERIFIED_OR_AMBIGUOUS` 時に `correction` が `null` かつ `audit_trace.abstention_reason` が必須であること。
 
-### 【Phase 1】11月4日（水）〜 11月5日（木）：評価基盤（Eval Suite 20件）・所有権隔離キャッシュ・公開承認ゲート
+### 【Phase 1】評価基盤（Eval Suite 20件）・キャッシュ・公開申請と審査API
 * **実装タスク**:
-  * [ ] `packages/eval`: `SPEC.md` 第5章に基づく20件の評価データセット（事実誤認8件、正しい主張5件、根拠不足5件、キャッシュ境界2件）の定義と、4指標（誤訂正率、判定保留の適切性、根拠対応確認率、誤キャッシュ率）を測定・レポート出力するCLIハーネスの実装。
-  * [ ] `claim_cache_key` によるキャッシュ判定実装（他ユーザーには `public_entries` の `PUBLISHED` かつ有効期限内のデータのみ返却し、未公開の `audit_results` は同一 `client_key_hash` 本人にのみ返却する隔離ロジック）。
-  * [ ] ユーザー同意API（`POST /api/consents`：所有者認可必須）と、管理者承認・撤回API（`POST /api/admin/reviews`：Cloudflare Access保護想定）の実装。
-  * [ ] `LIVE` モードと `DEMO` モード（`quota_usage` 非消費・LIVEテーブル非汚染・UIバッジ明示）の実装。
+  * [ ] `packages/eval`: 20件の評価データセットと4指標を測定・レポート出力するCLI。実行前に呼び出し件数を表示する。
+  * [ ] プライベートキャッシュ（ブラウザ内）と公開キャッシュの照会（`GET /api/public/lookup`）。
+  * [ ] `apps/api`: D1 の3テーブル、公開申請（`POST /api/submissions`、`GET /api/submissions/:id`、所有者認可）、管理者審査（`POST /api/admin/reviews`：Cloudflare Access保護）、公開一覧（`GET /api/public/entries`）。
+  * [ ] `LIVE` / `DEMO` モードの分離。
 * **Phase 1 必須受入テスト**:
-  1. `packages/eval` の20件評価ベンチマークを実行し、キャッシュ境界事例（数値・否定語違い）での誤キャッシュ率が0%であること、および根拠不足ケースで適切に `UNVERIFIED_OR_AMBIGUOUS`（判定保留）となることがレポート出力されること。
-  2. ユーザーAが実行した未公開の監査結果（`audit_results`）が、同じ文章を入力した別ユーザーBのキャッシュとしてヒットしないこと（情報漏洩防止テスト）。
-  3. 本人同意（`publication_consents`）と管理者承認（`publication_reviews`）の両方を経て `public_entries` に昇格した事例のみが、別ユーザーBのキャッシュおよび `GET /api/public/entries` で返却されること。
+  1. 20件の評価を実行し、キャッシュ境界事例での誤キャッシュ率が0%であること、根拠不足ケースで判定保留となることがレポート出力されること。
+  2. 異なる `X-Client-Token`（またはトークンなし）で `GET /api/submissions/:id` を叩いた際、`HTTP 403`（`UNAUTHORIZED_REQUEST_ACCESS`）で拒否されること。
+  3. 管理者が承認した申請だけが `GET /api/public/lookup` と `GET /api/public/entries` で返り、未審査・却下・撤回済みは返らないこと。
 
-### 【Phase 2】11月6日（金）〜 11月7日（土）：LINE非同期監査（Queues + Push）＆ 公開辞典UI
-* **実装タスク**:
-  * [ ] `POST /api/webhook/line`: 署名検証、`webhookEventId` 重複排除、`quota_usage` 予約、Cloudflare Queues投入、即時 `HTTP 200` 応答の実装。
-  * [ ] Queue Consumer: テキストおよびスクショ画像監査の非同期実行と、LINE Push APIによるFlex Message送信。判読不能・エラー時はクォータを `RELEASED` に戻して案内をPush送信。
-  * [ ] `apps/web`: `public_entries` テーブルのみを参照する公開辞典UI（一覧、カテゴリフィルタ、多段階監査トレース・エビデンス・制限事項の表示、`RETRACTED` 表示対応）。
-* **Phase 2 必須受入テスト**:
-  1. 同一 `webhookEventId` を持つLINE Webhookリクエストを再送した際、二重にQueue投入やクォータ消費が行われず `HTTP 200` が返ること。
-  2. 不鮮明な画像をLINEへ送信した際、非同期処理後にクォータが `RELEASED`（返還）され、案内メッセージがPush通知されること。
+### 【Phase 2】公開辞典UI
+* [ ] `apps/web`: `public_entries` のみを参照する公開辞典UI（一覧、カテゴリフィルタ、多段階監査トレース・根拠・制限事項・監査に使ったAIの表示、`RETRACTED` 表示、利用者のブラウザで作られた結果であることの明記）。
 
-### 【Phase 3】11月8日（日）〜 11月9日（月）：本番結合テスト・セキュリティ監査・（余力対応）
-* **実装タスク**:
-  * [ ] Cloudflare Workers / Pages / D1 / Queues 本番デプロイ（`geminihall.cc`）と管理エンドポイント保護。
-  * [ ] 実機ブラウザ、Anthropic API、Cloudflare、LINEのE2E結合テスト（個人の監査 ➔ 同意 ➔ 管理者承認 ➔ 公開辞典掲載の一気通貫フロー確認）と、ログへのAPIキー・PII非混入監査。
-  * [ ] ※上記すべてが `PASS` し余力がある場合のみ、Stretch Goal（DOM自動抽出ボタンまたは公開エントリ対象のVectorize類似検索）に着手。
+### 【Phase 3】本番結合テスト・セキュリティ監査・（余力対応）
+* [ ] Cloudflare Workers / Pages / D1 本番デプロイ（`geminihall.cc`、`workers_dev: false`）と管理エンドポイント保護。
+* [ ] 実機ブラウザでの E2E（監査 ➔ 公開申請 ➔ 管理者承認 ➔ 公開辞典掲載 ➔ 別の利用者の公開照会）と、ログへのキー・PII非混入監査。
+* [ ] ※上記すべてが `PASS` し余力がある場合のみ、Stretch Goal に着手。
 
-### 【Phase 4】11月10日（火）〜 14:00：パッケージング・デモ収録・最終提出
-* [ ] Chrome拡張ビルド成果物（ZIP）の作成、`README.md`（設計思想・Non-Oracle原則・Eval 20件の評価設計と結果の記載）の整備、デモ動画収録、リポジトリPublic化、提出。
+### 【Phase 4】パッケージング・公開
+* [ ] Chrome拡張ビルド成果物（ZIP）、`README.md`（設計思想・Non-Oracle原則・Eval 20件の評価設計と結果）の整備、デモ動画、リポジトリPublic化。

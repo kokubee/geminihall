@@ -1,0 +1,12 @@
+{
+  "name": "geminihall",
+  "private": true,
+  "packageManager": "pnpm@11.5.2",
+  "scripts": {
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
