@@ -100,3 +100,14 @@ describe("structural checks", () => {
     expect(issuePaths(baseResult({ severity_score: 6 }))).toContain("severity_score");
   });
 });
+
+describe("evidence URLs", () => {
+  it("accepts only http and https", () => {
+    for (const url of ["javascript:alert(1)", "data:text/html,x", "ftp://a/b"]) {
+      const r = baseResult();
+      r.evidence_sources = [{ ...r.evidence_sources[0]!, url }];
+      expect(issuePaths(r)).toContain("evidence_sources.0.url");
+    }
+    expect(AuditResultSchema.safeParse(baseResult()).success).toBe(true);
+  });
+});

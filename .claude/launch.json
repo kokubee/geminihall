@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "geminihall-local",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--prefix",
+        "apps/api",
+        "wrangler",
+        "dev",
+        "--config",
+        "apps/api/wrangler.jsonc",
+        "--port",
+        "8791",
+        "--ip",
+        "127.0.0.1"
+      ],
+      "port": 8791
+    }
+  ]
+}

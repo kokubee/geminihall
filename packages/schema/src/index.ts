@@ -41,9 +41,11 @@ export const AuditorSchema = z.object({
   model: z.string().min(1),
 });
 
+export const HttpUrlSchema = z.url({ protocol: /^https?$/ });
+
 export const EvidenceSourceSchema = z.object({
   title: z.string().min(1),
-  url: z.string().url(),
+  url: HttpUrlSchema,
   snippet: z.string().min(1),
   verified: z.boolean(),
 });
