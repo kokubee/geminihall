@@ -15,8 +15,10 @@ export function setNow(iso: string) {
 
 export const app = createApp(async (req) => req.headers.get(ADMIN_HEADER), () => nowMs);
 
+export const testEnv = { ...env, SUBMIT_LIMITER: undefined };
+
 export function call(path: string, init: RequestInit = {}) {
-  return app.request(path, init, env);
+  return app.request(path, init, testEnv);
 }
 
 export function postJson(path: string, body: unknown, headers: Record<string, string> = {}) {
