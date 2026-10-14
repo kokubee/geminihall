@@ -90,9 +90,9 @@
 ### ⑤ D1 データベース（3テーブル）
 
 1. `submissions`: 公開申請（本人同意の記録を兼ねる）
-   * `submission_id` (TEXT PK), `client_key_hash` (TEXT NOT NULL), `claim_cache_key` (TEXT NOT NULL), `original_claim` (TEXT NOT NULL), `result_json` (TEXT NOT NULL), `provider` (TEXT NOT NULL), `model` (TEXT NOT NULL), `consent_version` (TEXT NOT NULL), `review_state` (TEXT: `PENDING` | `APPROVED` | `REJECTED`), `created_at` (TEXT), `updated_at` (TEXT)
+   * `submission_id` (TEXT PK), `client_key_hash` (TEXT NOT NULL), `claim_cache_key` (TEXT NOT NULL), `original_claim` (TEXT NOT NULL), `context` (TEXT NULLABLE), `locale` (TEXT NOT NULL), `result_json` (TEXT NOT NULL), `provider` (TEXT NOT NULL), `model` (TEXT NOT NULL), `consent_version` (TEXT NOT NULL), `review_state` (TEXT: `PENDING` | `APPROVED` | `REJECTED`), `created_at` (TEXT), `updated_at` (TEXT)
 2. `public_entries`: 公開承認済みの編集・サニタイズ済み辞典エントリ（公開APIが参照する唯一のテーブル）
-   * `entry_id` (TEXT PK), `submission_id` (TEXT UNIQUE FK), `claim_cache_key` (TEXT INDEX), `publication_status` (TEXT: `PUBLISHED` | `RETRACTED`), `audit_status` (TEXT), `category` (TEXT NULLABLE), `severity_score` (INTEGER NULLABLE), `sanitized_title` (TEXT), `sanitized_claim` (TEXT), `correction` (TEXT NULLABLE), `evidence_json` (TEXT), `audit_trace_json` (TEXT), `limitations_json` (TEXT), `estimated_error_pattern` (TEXT NULLABLE), `provider` (TEXT), `model` (TEXT), `verified_at` (TEXT), `expires_at` (TEXT), `published_at` (TEXT)
+   * `entry_id` (TEXT PK), `submission_id` (TEXT UNIQUE FK), `claim_cache_key` (TEXT INDEX), `publication_status` (TEXT: `PUBLISHED` | `RETRACTED`), `audit_status` (TEXT), `category` (TEXT NULLABLE), `severity_score` (INTEGER NULLABLE), `sanitized_title` (TEXT), `sanitized_claim` (TEXT), `correction` (TEXT NULLABLE), `evidence_json` (TEXT), `audit_trace_json` (TEXT), `limitations_json` (TEXT), `estimated_error_pattern` (TEXT NULLABLE), `ttl_category` (TEXT), `provider` (TEXT), `model` (TEXT), `verified_at` (TEXT), `expires_at` (TEXT), `published_at` (TEXT)
 3. `publication_reviews`: 管理者による承認・却下・撤回の監査証跡
    * `review_id` (TEXT PK), `submission_id` (TEXT NOT NULL FK), `entry_id` (TEXT NULLABLE FK), `reviewer_id` (TEXT NOT NULL), `action` (TEXT: `APPROVE` | `REJECT` | `RETRACT`), `reason` (TEXT), `created_at` (TEXT)
 
@@ -135,7 +135,7 @@
 }
 ```
 
-* **エラーコード**: `INVALID_INPUT` / `UNAUTHORIZED_REQUEST_ACCESS` / `RATE_LIMITED` / `UPSTREAM_AI_UNAVAILABLE` / `INTERNAL_AUDIT_SCHEMA_VIOLATION`（後ろ2つは拡張内部の表示用）
+* **エラーコード**: `INVALID_INPUT` / `UNAUTHORIZED_REQUEST_ACCESS` / `RATE_LIMITED` / `UPSTREAM_AI_UNAVAILABLE` / `INTERNAL_AUDIT_SCHEMA_VIOLATION` / `INTERNAL_ERROR`（`UPSTREAM_AI_UNAVAILABLE` と `INTERNAL_AUDIT_SCHEMA_VIOLATION` は拡張内部の表示用）
 
 ---
 
@@ -179,3 +179,8 @@ JSON スキーマの構造検証とは独立して、「監査結果が事実お
   * `SUPPORTED_CLAIM` にも検証済みの根拠を必須とした（非オラクル原則に合わせるため）。
   * 監査結果に `auditor`（AI の種類とモデル）を追加した。
   * Zod 4 を使う。
+* **2026-10-15 v2.1**（Phase 1 実装時）:
+  * `submissions` に `context` と `locale`、`public_entries` に `ttl_category` を追加した。サーバーが申請内容からキャッシュキーを再計算し、監査結果の `normalized_claim` と `context_fingerprint` と一致しない申請を拒否するため、および公開辞典で情報の種類を表示するため。
+  * エラーコードに `INTERNAL_ERROR` を追加した（サーバー内部の予期しない失敗用）。
+  * 公開申請の識別子（`submission_id`）には監査結果の `request_id` を使い、同じ申請の再送を冪等にした。
+  * `UNVERIFIED_OR_AMBIGUOUS` の申請を承認する場合、管理者が訂正文を入力しても公開エントリの `correction` は `null` にする（不変条件3を公開側にも適用するため）。
