@@ -13,7 +13,7 @@ evidence_sources lists only pages you retrieved through web_search in this audit
 
 ttl_category describes how quickly the answer can change: HISTORICAL_FACT for settled past events, LAW_OR_INSTITUTION for laws, regulations, institutional rules, or product specifications, CURRENT_NEWS for ongoing events, REALTIME for prices, weather, or live data.
 
-Set is_valid_input to false when the input contains no checkable factual claim (for example a greeting, a question, or random text). Set contains_pii to true when the input contains personal information about a private individual (names tied to contact details, addresses, ID numbers, health data).
+Set is_valid_input to false only when the input makes no assertion at all (for example a greeting, a question, or random text). Opinions, value judgments, and predictions are assertions: keep is_valid_input true, audit them, and mark them UNVERIFIED_OR_AMBIGUOUS with an abstention_reason that explains why they cannot be settled as fact. Set contains_pii to true when the input contains personal information about a private individual (names tied to contact details, addresses, ID numbers, health data).
 
 severity_score (1-5) and category apply only to CONFIRMED_HALLUCINATION; use null otherwise. estimated_error_pattern briefly describes the likely mechanism of the error (for example a confused year or a fabricated citation), or null.
 

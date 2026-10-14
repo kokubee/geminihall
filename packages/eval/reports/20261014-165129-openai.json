@@ -1,0 +1,160 @@
+{
+  "startedAt": "2026-10-14T16:51:29.847Z",
+  "provider": "OPENAI",
+  "model": "gpt-6-astra",
+  "metrics": {
+    "falseCorrectionRate": {
+      "numerator": 0,
+      "denominator": 1,
+      "rate": 0
+    },
+    "abstentionAccuracy": {
+      "numerator": 1,
+      "denominator": 1,
+      "rate": 1
+    },
+    "evidenceGroundingRate": {
+      "numerator": 0,
+      "denominator": 1,
+      "rate": 0
+    },
+    "falseCacheHitRate": {
+      "numerator": 0,
+      "denominator": 3,
+      "rate": 0
+    },
+    "errorDetectionRate": {
+      "numerator": 0,
+      "denominator": 0,
+      "rate": null
+    },
+    "supportedClaimRate": {
+      "numerator": 0,
+      "denominator": 0,
+      "rate": null
+    },
+    "sourceAliveRate": {
+      "numerator": 1,
+      "denominator": 1,
+      "rate": 1
+    },
+    "auditFailures": 0
+  },
+  "outcomes": [
+    {
+      "case": {
+        "id": "A3",
+        "kind": "AMBIGUOUS",
+        "claim": "寿司は世界で最もおいしい料理である。",
+        "groundTruth": "価値判断であり、事実として検証できない"
+      },
+      "result": {
+        "request_id": "aca7d279-971b-46b1-bde7-8a0ae1cf0e20",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "UNVERIFIED_OR_AMBIGUOUS",
+        "evidence_status": "INSUFFICIENT",
+        "severity_score": null,
+        "category": null,
+        "ttl_category": "HISTORICAL_FACT",
+        "verified_at": "2026-10-14T16:52:03.493Z",
+        "expires_at": "2026-11-13T16:52:03.493Z",
+        "evidence_checked_at": "2026-10-14T16:52:03.493Z",
+        "normalized_claim": "寿司は世界で最もおいしい料理である。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "寿司のおいしさは、世界のすべての料理を上回る。",
+              "verification_target": "料理のおいしさの評価基準と世界規模の比較調査。補助資料として、米国国立聴覚・伝達障害研究所の食の嗜好に関する解説を確認する。",
+              "status": "UNVERIFIABLE"
+            }
+          ],
+          "alignment_reasoning": "第1段階：主張を、寿司のおいしさが世界一であるという単一の評価に分解した。第2段階：公的機関の解説を検索した。取得資料は、食の嗜好に遺伝的・文化的な違いがあると説明しているが、寿司の世界順位を示してはいない。 第3段階：主張には評価基準、評価者、比較対象、調査結果が指定されておらず、主観的な価値判断として判定を保留する。証拠がないことを、主張が誤りである証拠とは扱わない。",
+          "abstention_reason": "「最もおいしい」は評価基準や評価者に依存する意見であり、提示された内容のままでは客観的事実として真偽を確定できない。"
+        },
+        "hallucinated_claim": null,
+        "correction": null,
+        "unverified_notes": "個人の好みの表明としては成立する。一方、世界共通の客観的順位を述べた事実としては、今回取得した資料では裏付けられない。",
+        "evidence_sources": [
+          {
+            "title": "数値の意味：味覚と嗅覚の疫学的視点",
+            "url": "https://www.nidcd.nih.gov/health/statistics/what-numbers-mean-epidemiological-perspective-taste-smell",
+            "snippet": "該当箇所の日本語訳：私たちの食の嗜好には、遺伝的・文化的に大きなばらつきがある。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": null,
+        "limitations": [
+          "取得した資料は食の嗜好に関する一般的な解説であり、寿司と世界の全料理を比較した研究ではない。",
+          "評価基準、対象集団、調査時点が指定されていない。",
+          "更新頻度の選択肢に主観的評価の区分がないため、HISTORICAL_FACTを便宜上選択した。歴史的事実として認定したという意味ではない。"
+        ]
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 33.65
+    }
+  ],
+  "sources": [
+    {
+      "caseId": "A3",
+      "url": "https://www.nidcd.nih.gov/health/statistics/what-numbers-mean-epidemiological-perspective-taste-smell",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": false
+    }
+  ],
+  "pairs": [
+    {
+      "case": {
+        "id": "K1",
+        "variation": "NUMBER",
+        "a": {
+          "claim": "東京スカイツリーの高さは634メートルである。"
+        },
+        "b": {
+          "claim": "東京スカイツリーの高さは643メートルである。"
+        }
+      },
+      "keyA": "53485eba6bdd0109d1dfc31d9905ef2bced9b99e7dd0c77cc9db6a858036de83",
+      "keyB": "0909f56807c97966ad28e283c4b694aca72241b4c2c56e4d91844f9874f40b90"
+    },
+    {
+      "case": {
+        "id": "K2",
+        "variation": "NEGATION",
+        "a": {
+          "claim": "東海道新幹線は1964年に開業した。"
+        },
+        "b": {
+          "claim": "東海道新幹線は1964年に開業しなかった。"
+        }
+      },
+      "keyA": "d520ceedb2860177301889e0298942a89fcbbef6fb2a25a199239482527af8c6",
+      "keyB": "4029b189c875ae357fca4c4ef874c699ab858de61a79f6848aad3769b62f2700"
+    },
+    {
+      "case": {
+        "id": "K-ctx",
+        "variation": "CONTEXT",
+        "a": {
+          "claim": "この制度は2022年に始まった。",
+          "context": "質問: 成年年齢の引き下げはいつ？"
+        },
+        "b": {
+          "claim": "この制度は2022年に始まった。",
+          "context": "質問: インボイス制度はいつ始まった？"
+        }
+      },
+      "keyA": "d301f4a66978c255ee4fe7ccec57210c9d5c8f73537cf73a6a9ce5712a6ddadb",
+      "keyB": "af33de07fd6426799cbb576ff488c45f6063860319f5c6a495e7c3682f2cdbcd"
+    }
+  ]
+}
