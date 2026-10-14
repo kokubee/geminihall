@@ -1,0 +1,1472 @@
+{
+  "startedAt": "2026-10-14T16:43:27.022Z",
+  "provider": "OPENAI",
+  "model": "gpt-6-astra",
+  "metrics": {
+    "falseCorrectionRate": {
+      "numerator": 0,
+      "denominator": 10,
+      "rate": 0
+    },
+    "abstentionAccuracy": {
+      "numerator": 4,
+      "denominator": 5,
+      "rate": 0.8
+    },
+    "evidenceGroundingRate": {
+      "numerator": 25,
+      "denominator": 27,
+      "rate": 0.9259259259259259
+    },
+    "falseCacheHitRate": {
+      "numerator": 0,
+      "denominator": 3,
+      "rate": 0
+    },
+    "errorDetectionRate": {
+      "numerator": 8,
+      "denominator": 8,
+      "rate": 1
+    },
+    "supportedClaimRate": {
+      "numerator": 5,
+      "denominator": 5,
+      "rate": 1
+    },
+    "sourceAliveRate": {
+      "numerator": 30,
+      "denominator": 31,
+      "rate": 0.967741935483871
+    },
+    "auditFailures": 1
+  },
+  "outcomes": [
+    {
+      "case": {
+        "id": "E1",
+        "kind": "FACTUAL_ERROR",
+        "claim": "日本国憲法は1950年5月3日に施行された。",
+        "expectedCorrectionTokens": [
+          "1947"
+        ],
+        "groundTruth": "1947年（昭和22年）5月3日施行",
+        "primarySource": "https://www.ndl.go.jp/constitution/gaisetsu/05gaisetsu.html"
+      },
+      "result": {
+        "request_id": "a087a592-a80e-4e85-ab6d-b777fb5c419e",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "CONFIRMED_HALLUCINATION",
+        "evidence_status": "VERIFIED",
+        "severity_score": 2,
+        "category": "Chronological_Error",
+        "ttl_category": "HISTORICAL_FACT",
+        "verified_at": "2026-10-14T16:43:40.373Z",
+        "expires_at": "2026-11-13T16:43:40.373Z",
+        "evidence_checked_at": "2026-10-14T16:43:40.373Z",
+        "normalized_claim": "日本国憲法は1950年5月3日に施行された。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "日本国憲法の施行日は1950年5月3日である。",
+              "verification_target": "国立国会図書館「日本国憲法の誕生」の施行日に関する記述と、国立公文書館「日本国憲法」の解説。",
+              "status": "CONTRADICTED"
+            }
+          ],
+          "alignment_reasoning": "手順1：施行日という単一の検証可能な事実を抽出した。手順2：ウェブ検索で取得した国立国会図書館と国立公文書館の資料は、ともに施行日を1947年5月3日と明記している。手順3：主張の月日は一致するが、1950年という年が資料と矛盾するため、誤りが確認されたと判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": "日本国憲法は1950年5月3日に施行された。",
+        "correction": "日本国憲法は1947年（昭和22年）5月3日に施行された。",
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "概説[第5章　憲法の施行] | 日本国憲法の誕生",
+            "url": "https://www.ndl.go.jp/constitution/gaisetsu/05gaisetsu.html",
+            "snippet": "1947（昭和22）年5月3日、「日本国憲法」が施行された。",
+            "verified": true
+          },
+          {
+            "title": "日本国憲法",
+            "url": "https://www.archives.go.jp/owning/mini_img/1-4.html",
+            "snippet": "日本国憲法は、昭和22（1947）年5月3日から施行されました。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": "施行日の月日は正しいが、施行年を1947年から1950年へ取り違えたと考えられる。",
+        "limitations": []
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 13.351
+    },
+    {
+      "case": {
+        "id": "E2",
+        "kind": "FACTUAL_ERROR",
+        "claim": "東京スカイツリーの高さは333メートルである。",
+        "expectedCorrectionTokens": [
+          "634"
+        ],
+        "groundTruth": "高さ634m",
+        "primarySource": "https://www.tokyo-skytree.jp/about/"
+      },
+      "result": {
+        "request_id": "4da81a0a-6c1f-4e69-abf9-74c70e190b74",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "CONFIRMED_HALLUCINATION",
+        "evidence_status": "VERIFIED",
+        "severity_score": 1,
+        "category": "Fact_Fabrication",
+        "ttl_category": "HISTORICAL_FACT",
+        "verified_at": "2026-10-14T16:43:40.168Z",
+        "expires_at": "2026-11-13T16:43:40.168Z",
+        "evidence_checked_at": "2026-10-14T16:43:40.168Z",
+        "normalized_claim": "東京スカイツリーの高さは333メートルである。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "東京スカイツリーの高さは333メートルである。",
+              "verification_target": "東京スカイツリー公式サイトのスペックに記載された高さ。",
+              "status": "CONTRADICTED"
+            }
+          ],
+          "alignment_reasoning": "手順1：検証対象を東京スカイツリーの高さという単一の事実に分解した。手順2：ウェブ検索で公式サイトのスペックページを取得し、高さが634mと明記されていることを確認した。手順3：主張の333メートルは公式の634メートルと矛盾するため、誤りと判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": "東京スカイツリーの高さは333メートルである。",
+        "correction": "東京スカイツリーの高さは634メートルである。",
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "東京スカイツリーのスペック（高さ634m）【公式】東京スカイツリー TOKYO SKYTREE",
+            "url": "https://www.tokyo-skytree.jp/about/spec/",
+            "snippet": "この甲斐もあり、高さ634mの東京スカイツリーは2011年11月17日にはギネスワールドレコーズ社より世界一高いタワーとして認定されました。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": "高さの数値の取り違え。誤った数値の由来は未確認。",
+        "limitations": []
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 13.148
+    },
+    {
+      "case": {
+        "id": "E3",
+        "kind": "FACTUAL_ERROR",
+        "claim": "日本の消費税率は2014年4月1日に8%から10%へ引き上げられた。",
+        "expectedCorrectionTokens": [
+          "2019",
+          "令和元年"
+        ],
+        "groundTruth": "2014年4月1日は5%→8%、10%への引き上げは2019年（令和元年）10月1日",
+        "primarySource": "https://www.mof.go.jp/tax_policy/summary/consumption/d05_1.pdf"
+      },
+      "result": {
+        "request_id": "baeaf3c2-f0f4-4557-96c1-9a4a81cd5d62",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "CONFIRMED_HALLUCINATION",
+        "evidence_status": "VERIFIED",
+        "severity_score": 2,
+        "category": "Chronological_Error",
+        "ttl_category": "HISTORICAL_FACT",
+        "verified_at": "2026-10-14T16:43:49.811Z",
+        "expires_at": "2026-11-13T16:43:49.811Z",
+        "evidence_checked_at": "2026-10-14T16:43:49.811Z",
+        "normalized_claim": "日本の消費税率は2014年4月1日に8%から10%へ引き上げられた。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "日本では2014年4月1日に消費税率が引き上げられた。",
+              "verification_target": "財務省「消費税率の引上げと使途の明確化（税制抜本改革）」の実施日",
+              "status": "SUPPORTED"
+            },
+            {
+              "sub_claim": "2014年4月1日の引上げ直前の消費税率は8％だった。",
+              "verification_target": "財務省の同資料に記載された2014年4月1日の変更前税率",
+              "status": "CONTRADICTED"
+            },
+            {
+              "sub_claim": "2014年4月1日の引上げ後の消費税率は10％だった。",
+              "verification_target": "財務省の同資料に記載された変更後税率、および国税庁「No.6102 消費税の軽減税率制度」の10％への引上げ実施日",
+              "status": "CONTRADICTED"
+            }
+          ],
+          "alignment_reasoning": "第1段階：実施日、変更前税率、変更後税率に分解した。第2段階：財務省と国税庁の一次資料を検索・取得した。財務省資料は2014年4月1日の変更を5％から8％、2019年10月1日の変更を8％から10％と記載し、国税庁資料も後者の実施日を確認している。第3段階：主張の税率と実施日の組合せが取得資料と明確に矛盾するため、誤りと判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": "日本の消費税率は2014年4月1日に8%から10%へ引き上げられた。",
+        "correction": "2014年4月1日の引上げは5％から8％。8％から10％への標準税率の引上げは2019年10月1日であり、同時に8％の軽減税率が導入された。いずれも地方消費税を含む税率である。",
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "消費税率の引上げと使途の明確化（税制抜本改革）",
+            "url": "https://www.mof.go.jp/tax_policy/summary/consumption/d05_1.pdf",
+            "snippet": "平成26年４月１日 ５％ ８％ ／ 令和元年10月１日 ８％ 10％",
+            "verified": true
+          },
+          {
+            "title": "No.6102 消費税の軽減税率制度｜国税庁",
+            "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shohi/6102.htm",
+            "snippet": "令和元年10月1日から、消費税および地方消費税の税率が8パーセントから10パーセントへ引き上げられ、この税率引き上げと同時に消費税の軽減税率制度が実施されました。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": "2014年の増税実施日と、2019年の変更前後の税率を混同した可能性がある。",
+        "limitations": [
+          "一般的な税率引上げの履歴を対象とし、個別取引に適用される経過措置は検証対象としていない。"
+        ]
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 22.788
+    },
+    {
+      "case": {
+        "id": "E4",
+        "kind": "FACTUAL_ERROR",
+        "claim": "日本の個人情報保護法は2010年4月1日に全面施行された。",
+        "expectedCorrectionTokens": [
+          "2005",
+          "平成17"
+        ],
+        "groundTruth": "2005年（平成17年）4月1日全面施行",
+        "primarySource": "https://www.ppc.go.jp/files/pdf/personal_development.pdf"
+      },
+      "result": {
+        "request_id": "ea58476c-96dd-4c4f-a1c0-3a147d18e92a",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "CONFIRMED_HALLUCINATION",
+        "evidence_status": "VERIFIED",
+        "severity_score": 2,
+        "category": "Chronological_Error",
+        "ttl_category": "LAW_OR_INSTITUTION",
+        "verified_at": "2026-10-14T16:43:56.442Z",
+        "expires_at": "2026-10-15T16:43:56.442Z",
+        "evidence_checked_at": "2026-10-14T16:43:56.442Z",
+        "normalized_claim": "日本の個人情報保護法は2010年4月1日に全面施行された。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "日本の個人情報保護法の全面施行日は2010年4月1日である。",
+              "verification_target": "厚生労働省「個人情報の保護に関する施策の推進について」に記載された全面施行日、および個人情報保護委員会「個人情報保護法の概要」の成立・改正経緯。",
+              "status": "CONTRADICTED"
+            }
+          ],
+          "alignment_reasoning": "第1段階：全面施行日という単一の検証可能な事実に分解した。第2段階：公的資料を検索・取得した。厚生労働省は「平成１７年４月１日より全面施行」と明記し、個人情報保護委員会も「2005年（平成17年）4月全面施行」と記載している。第3段階：両資料は整合し、主張の2010年とは矛盾するため、施行年の誤りと判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": "日本の個人情報保護法は2010年4月1日に全面施行された。",
+        "correction": "日本の個人情報保護法は2005年（平成17年）4月1日に全面施行された。",
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "個人情報の保護に関する施策の推進について",
+            "url": "https://www.mhlw.go.jp/shingi/2004/08/s0824-4c.html",
+            "snippet": "平成１７年４月１日より全面施行。",
+            "verified": true
+          },
+          {
+            "title": "個人情報保護法の概要",
+            "url": "https://www.ppc.go.jp/files/pdf/kouteki_gaiyou_R802.pdf",
+            "snippet": "2003年（平成15年） 個人情報保護法等 成立 2005年（平成17年）4月全面施行",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": "月日は正しいが、全面施行年を2005年から2010年へ取り違えた可能性がある。",
+        "limitations": [
+          "誤った年が生成された原因自体は、提示された主張と取得資料だけでは特定できない。"
+        ]
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 16.271
+    },
+    {
+      "case": {
+        "id": "E5",
+        "kind": "FACTUAL_ERROR",
+        "claim": "富士山の標高は3676メートルである。",
+        "expectedCorrectionTokens": [
+          "3776"
+        ],
+        "groundTruth": "標高3776m",
+        "primarySource": "https://www.gsi.go.jp/WNEW/PRESS-RELEASE/keikaku61003.html"
+      },
+      "result": {
+        "request_id": "eb80966e-1103-47bd-9552-ed9fa36f1afc",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "CONFIRMED_HALLUCINATION",
+        "evidence_status": "VERIFIED",
+        "severity_score": 1,
+        "category": "Fact_Fabrication",
+        "ttl_category": "HISTORICAL_FACT",
+        "verified_at": "2026-10-14T16:43:57.161Z",
+        "expires_at": "2026-11-13T16:43:57.161Z",
+        "evidence_checked_at": "2026-10-14T16:43:57.161Z",
+        "normalized_claim": "富士山の標高は3676メートルである。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "富士山の標高は3676メートルである。",
+              "verification_target": "国土地理院の「日本の主な山岳標高一覧」に記載された富士山（剣ヶ峯）の標高、および三角点「富士山」の標高に関する公式発表。",
+              "status": "CONTRADICTED"
+            }
+          ],
+          "alignment_reasoning": "手順1：検証対象を富士山の標高という単一の数値的事実に分解した。手順2：国土地理院の一覧では富士山（剣ヶ峯）は3776mと記載され、同院の公式発表も山の標高は3776mのままであると明記している。手順3：主張の3676mは公式資料と矛盾するため、誤りが確認されたと判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": "富士山の標高は3676メートルである。",
+        "correction": "富士山の標高は3776メートルである。",
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "立体地図（日本の主な山岳）",
+            "url": "https://maps.gsi.go.jp/3d/mountain/mountain.html",
+            "snippet": "富士山（剣ヶ峯）　山梨県 静岡県　富士山とその周辺　3776m",
+            "verified": true
+          },
+          {
+            "title": "衛星測位を基盤とする三角点「富士山」の新しい標高～基準点の標高成果の改定に向けた取組～ | 国土地理院",
+            "url": "https://web1.gsi.go.jp/WNEW/PRESS-RELEASE/keikaku61003.html",
+            "snippet": "なお、富士山の最高地点は、今回測量した三角点より高いところにありますが、標高は「3776m」のままで変更はありません。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": "3776の百の位を6とした転記ミス、または数値の記憶違いの可能性がある。原因自体は特定できない。",
+        "limitations": [
+          "公表されたメートル単位の山岳標高を検証しており、独立した実測は行っていない。"
+        ]
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 16.787
+    },
+    {
+      "case": {
+        "id": "E6",
+        "kind": "FACTUAL_ERROR",
+        "claim": "日本のマイナンバー（個人番号）は10桁の番号である。",
+        "expectedCorrectionTokens": [
+          "12"
+        ],
+        "groundTruth": "12桁",
+        "primarySource": "https://www.digital.go.jp/policies/mynumber_faq_02"
+      },
+      "result": {
+        "request_id": "1b768f5e-4fff-4cb8-b536-45b77d1ef7c7",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "CONFIRMED_HALLUCINATION",
+        "evidence_status": "VERIFIED",
+        "severity_score": 2,
+        "category": "Fact_Fabrication",
+        "ttl_category": "LAW_OR_INSTITUTION",
+        "verified_at": "2026-10-14T16:44:03.724Z",
+        "expires_at": "2026-10-15T16:44:03.724Z",
+        "evidence_checked_at": "2026-10-14T16:44:03.724Z",
+        "normalized_claim": "日本のマイナンバー(個人番号)は10桁の番号である。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "日本のマイナンバー（個人番号）の桁数は10桁である。",
+              "verification_target": "デジタル庁「よくある質問：マイナンバー制度について（総論）」に記載されたマイナンバーの桁数。",
+              "status": "CONTRADICTED"
+            }
+          ],
+          "alignment_reasoning": "手順1：主張を個人番号の桁数という単一の検証可能な事実に分解した。手順2：ウェブ検索で取得したデジタル庁の公式説明は、マイナンバーを「1人にひとつの12桁の番号」と明記している。手順3：主張の10桁は公式説明の12桁と直接矛盾するため、誤りが確認されたと判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": "日本のマイナンバー（個人番号）は10桁の番号である。",
+        "correction": "日本のマイナンバー（個人番号）は10桁ではなく、12桁の番号である。",
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "よくある質問：マイナンバー制度について（総論）｜デジタル庁",
+            "url": "https://www.digital.go.jp/policies/mynumber_faq_01",
+            "snippet": "マイナンバーは、住民票を有する全ての方が持つ1人にひとつの12桁の番号",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": "番号の桁数の取り違え。具体的な混同元は不明。",
+        "limitations": []
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 13.914
+    },
+    {
+      "case": {
+        "id": "E7",
+        "kind": "FACTUAL_ERROR",
+        "claim": "日本の成年年齢は2020年4月1日に20歳から18歳に引き下げられた。",
+        "expectedCorrectionTokens": [
+          "2022",
+          "令和4"
+        ],
+        "groundTruth": "2022年（令和4年）4月1日施行",
+        "primarySource": "https://www.moj.go.jp/MINJI/minji07_00218.html"
+      },
+      "result": {
+        "request_id": "7ea1e54d-3b14-4d95-bb12-556e986eb391",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "CONFIRMED_HALLUCINATION",
+        "evidence_status": "VERIFIED",
+        "severity_score": 2,
+        "category": "Chronological_Error",
+        "ttl_category": "LAW_OR_INSTITUTION",
+        "verified_at": "2026-10-14T16:44:11.053Z",
+        "expires_at": "2026-10-15T16:44:11.053Z",
+        "evidence_checked_at": "2026-10-14T16:44:11.053Z",
+        "normalized_claim": "日本の成年年齢は2020年4月1日に20歳から18歳に引き下げられた。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "日本の成年年齢は20歳から18歳に引き下げられた。",
+              "verification_target": "法務省「民法の一部を改正する法律（成年年齢関係）について」に記載された改正内容",
+              "status": "SUPPORTED"
+            },
+            {
+              "sub_claim": "成年年齢の引下げは2020年4月1日に施行された。",
+              "verification_target": "同法務省資料に記載された改正法の施行日",
+              "status": "CONTRADICTED"
+            }
+          ],
+          "alignment_reasoning": "第1段階：変更前後の成年年齢と施行日を分けて検証した。第2段階：法務省の公式資料を検索して取得した。同資料は20歳から18歳への引下げを明記し、施行日を令和4年（2022年）4月1日としている。第3段階：年齢の変更内容は正しいが、主張の施行年は公式資料と矛盾するため、年代の誤りと判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": "日本の成年年齢が引き下げられた日は2020年4月1日である。",
+        "correction": "日本の民法上の成年年齢が20歳から18歳に引き下げられたのは、2022年4月1日である。",
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "法務省：民法の一部を改正する法律（成年年齢関係）について",
+            "url": "https://www.moj.go.jp/MINJI/minji07_00218.html",
+            "snippet": "平成３０年６月１３日、民法の成年年齢を２０歳から１８歳に引き下げること等を内容とする民法の一部を改正する法律が成立し、令和４年４月１日から施行されました。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": "施行日の月日は正しいが、施行年の2022年を2020年と取り違えた可能性がある。",
+        "limitations": [
+          "監査対象は民法上の成年年齢の変更内容と施行日に限定した。"
+        ]
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 14.611
+    },
+    {
+      "case": {
+        "id": "E8",
+        "kind": "FACTUAL_ERROR",
+        "claim": "東海道新幹線は1970年の大阪万博に合わせて1970年に開業した。",
+        "expectedCorrectionTokens": [
+          "1964"
+        ],
+        "groundTruth": "1964年10月1日開業",
+        "primarySource": "https://jr-central.co.jp/news/release/_pdf/000043174.pdf"
+      },
+      "result": {
+        "request_id": "dfdbbc4c-0898-444d-b385-deeab5a25c34",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "CONFIRMED_HALLUCINATION",
+        "evidence_status": "VERIFIED",
+        "severity_score": 2,
+        "category": "Chronological_Error",
+        "ttl_category": "HISTORICAL_FACT",
+        "verified_at": "2026-10-14T16:44:19.206Z",
+        "expires_at": "2026-11-13T16:44:19.206Z",
+        "evidence_checked_at": "2026-10-14T16:44:19.206Z",
+        "normalized_claim": "東海道新幹線は1970年の大阪万博に合わせて1970年に開業した。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "東海道新幹線は1970年に開業した。",
+              "verification_target": "国立公文書館「東海道新幹線が開通する」に記載された開通日。",
+              "status": "CONTRADICTED"
+            },
+            {
+              "sub_claim": "大阪万博は1970年に開催された。",
+              "verification_target": "外務省「日本における国際博覧会」の日本万国博覧会の会期。",
+              "status": "SUPPORTED"
+            },
+            {
+              "sub_claim": "東海道新幹線の開業は大阪万博の開催に合わせたものだった。",
+              "verification_target": "国土交通省「経済成長とインフラ整備の歴史」の東海道新幹線の開業経緯。",
+              "status": "CONTRADICTED"
+            }
+          ],
+          "alignment_reasoning": "第1段階：開業年、万博の開催年、開業時期と開催行事の関係の3点に分解した。第2段階：ウェブ検索で取得した公的資料を照合した。国立公文書館は開通日を1964年10月1日とし、外務省は大阪万博の会期を1970年3月15日～9月13日としている。国土交通省は、東海道新幹線が1964年の東京オリンピック開催に合わせて開業したと説明している。第3段階：大阪万博の開催年は正しいが、開業年と開業時期を結び付けた行事が公的資料に反するため、誤りが確認されたと判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": "東海道新幹線は1970年の大阪万博に合わせて1970年に開業した。",
+        "correction": "東海道新幹線は、1964年の東京オリンピック開催に合わせ、1964年10月1日に東京～新大阪間で開業した。大阪万博の開催期間は1970年3月15日～9月13日であり、新幹線の開業より後である。",
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "昭和39年（1964）10月｜東海道新幹線が開通する：日本のあゆみ",
+            "url": "https://www.archives.go.jp/ayumi/kobetsu/s39_1964_03.html",
+            "snippet": "昭和39年（1964）10月1日、東京～大阪間の東海道新幹線が開通しました。",
+            "verified": true
+          },
+          {
+            "title": "1　経済成長とインフラ整備の歴史",
+            "url": "https://www.mlit.go.jp/hakusyo/mlit/h27/hakusho/h28/html/n1121000.html",
+            "snippet": "1964年大会開催に合わせるべく、1959年の着工からわずか5年半という期間と3,800億円の工費をかけ、1964年10月1日、東京駅から新大阪駅までの515kmを約4時間で結ぶ夢の超特急「東海道新幹線」が開業した。",
+            "verified": true
+          },
+          {
+            "title": "日本における国際博覧会｜外務省",
+            "url": "https://www.mofa.go.jp/mofaj/gaiko/hakurankai/banpaku/nihon.html",
+            "snippet": "日本万国博覧会（一般博）。会期：昭和45年（1970年）3月15日～9月13日（183日間）。場所：大阪千里丘陵。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": "1964年の東京オリンピックと1970年の大阪万博を混同し、新幹線の開業年と関連行事を取り違えた可能性がある。",
+        "limitations": [
+          "誤りの発生原因は推定であり、元のAIの生成過程は確認できない。"
+        ]
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 22.045
+    },
+    {
+      "case": {
+        "id": "C1",
+        "kind": "CORRECT",
+        "claim": "日本国憲法は1947年5月3日に施行された。",
+        "groundTruth": "正しい",
+        "primarySource": "https://www.ndl.go.jp/constitution/gaisetsu/05gaisetsu.html"
+      },
+      "result": {
+        "request_id": "27a5a612-686f-4ddb-9052-083e4018924a",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "SUPPORTED_CLAIM",
+        "evidence_status": "VERIFIED",
+        "severity_score": null,
+        "category": null,
+        "ttl_category": "HISTORICAL_FACT",
+        "verified_at": "2026-10-14T16:44:16.310Z",
+        "expires_at": "2026-11-13T16:44:16.310Z",
+        "evidence_checked_at": "2026-10-14T16:44:16.310Z",
+        "normalized_claim": "日本国憲法は1947年5月3日に施行された。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "日本国憲法の施行日は1947年5月3日である。",
+              "verification_target": "国立国会図書館「日本国憲法の誕生」の施行日についての記述、および衆議院掲載の日本国憲法の施行日。",
+              "status": "SUPPORTED"
+            }
+          ],
+          "alignment_reasoning": "第1段階：施行日という単一の事実を検証対象とした。第2段階：ウェブ検索で取得した国立国会図書館の解説は1947（昭和22）年5月3日の施行を明記し、衆議院の掲載資料も同じ日付を示している。第3段階：主張の全体が取得資料と一致するため、SUPPORTED_CLAIMと判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": null,
+        "correction": null,
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "概説[第5章　憲法の施行] | 日本国憲法の誕生",
+            "url": "https://www.ndl.go.jp/constitution/gaisetsu/05gaisetsu.html",
+            "snippet": "1947（昭和22）年5月3日、「日本国憲法」が施行された。",
+            "verified": true
+          },
+          {
+            "title": "日本国憲法",
+            "url": "https://www.shugiin.go.jp/internet/itdb_annai.nsf/html/statics/shiryo/dl-constitution.htm",
+            "snippet": "昭和２２年５月３日施行",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": null,
+        "limitations": []
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 12.586
+    },
+    {
+      "case": {
+        "id": "C2",
+        "kind": "CORRECT",
+        "claim": "東京スカイツリーの高さは634メートルである。",
+        "groundTruth": "正しい",
+        "primarySource": "https://www.tokyo-skytree.jp/about/"
+      },
+      "result": {
+        "request_id": "38101575-2e87-445b-9faf-30e4964c8c0e",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "SUPPORTED_CLAIM",
+        "evidence_status": "VERIFIED",
+        "severity_score": null,
+        "category": null,
+        "ttl_category": "HISTORICAL_FACT",
+        "verified_at": "2026-10-14T16:44:21.399Z",
+        "expires_at": "2026-11-13T16:44:21.399Z",
+        "evidence_checked_at": "2026-10-14T16:44:21.399Z",
+        "normalized_claim": "東京スカイツリーの高さは634メートルである。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "東京スカイツリーの高さは634メートルである。",
+              "verification_target": "東京スカイツリー公式サイトの高さに関する記載",
+              "status": "SUPPORTED"
+            }
+          ],
+          "alignment_reasoning": "第1段階：高さについての単一の事実に分解した。第2段階：公式サイトを検索し、「アウトライン」に高さ634メートルと明記されていることを確認した。第3段階：対象と数値が主張に一致し、すべての重要な内容が裏付けられるため、SUPPORTED_CLAIMと判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": null,
+        "correction": null,
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "アウトライン〖公式〗東京スカイツリー TOKYO SKYTREE",
+            "url": "https://www.tokyo-skytree.jp/about/outline/",
+            "snippet": "高さ634メートル。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": null,
+        "limitations": []
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 10.346
+    },
+    {
+      "case": {
+        "id": "C3",
+        "kind": "CORRECT",
+        "claim": "日本のマイナンバー（個人番号）は12桁の番号である。",
+        "groundTruth": "正しい",
+        "primarySource": "https://www.digital.go.jp/policies/mynumber_faq_02"
+      },
+      "result": {
+        "request_id": "817e4b21-610c-4f54-92c2-cdc5b4c28248",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "SUPPORTED_CLAIM",
+        "evidence_status": "VERIFIED",
+        "severity_score": null,
+        "category": null,
+        "ttl_category": "LAW_OR_INSTITUTION",
+        "verified_at": "2026-10-14T16:44:28.039Z",
+        "expires_at": "2026-10-15T16:44:28.039Z",
+        "evidence_checked_at": "2026-10-14T16:44:28.039Z",
+        "normalized_claim": "日本のマイナンバー(個人番号)は12桁の番号である。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "日本のマイナンバー（個人番号）の桁数は12桁である。",
+              "verification_target": "デジタル庁「よくある質問：マイナンバー（個人番号）について」に記載された番号の桁数。",
+              "status": "SUPPORTED"
+            }
+          ],
+          "alignment_reasoning": "手順1：主張を、個人番号の桁数という単一の検証可能な事実として整理した。手順2：ウェブ検索でデジタル庁の公式資料を取得し、「12桁のマイナンバーを作成します」との記載を確認した。同庁の制度総論にも「1人にひとつの12桁の番号」と明記されている。手順3：主張の全内容が取得した公式資料と一致するため、支持される主張と判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": null,
+        "correction": null,
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "よくある質問：マイナンバー（個人番号）について｜デジタル庁",
+            "url": "https://www.digital.go.jp/policies/mynumber_faq_02",
+            "snippet": "住民票コードを元に12桁のマイナンバーを作成しますが、マイナンバーから住民票コードが復元できない番号体系となります。",
+            "verified": true
+          },
+          {
+            "title": "よくある質問：マイナンバー制度について（総論）｜デジタル庁",
+            "url": "https://www.digital.go.jp/policies/mynumber_faq_01",
+            "snippet": "マイナンバーは、住民票を有する全ての方が持つ1人にひとつの12桁の番号で",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": null,
+        "limitations": []
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 11.729
+    },
+    {
+      "case": {
+        "id": "C4",
+        "kind": "CORRECT",
+        "claim": "日本の民法上の成年年齢は、2022年4月1日から18歳になった。",
+        "groundTruth": "正しい",
+        "primarySource": "https://www.moj.go.jp/MINJI/minji07_00218.html"
+      },
+      "result": {
+        "request_id": "f9b7faf3-ec8f-4b5e-9a1a-225383eea4a5",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "SUPPORTED_CLAIM",
+        "evidence_status": "VERIFIED",
+        "severity_score": null,
+        "category": null,
+        "ttl_category": "LAW_OR_INSTITUTION",
+        "verified_at": "2026-10-14T16:44:32.218Z",
+        "expires_at": "2026-10-15T16:44:32.218Z",
+        "evidence_checked_at": "2026-10-14T16:44:32.218Z",
+        "normalized_claim": "日本の民法上の成年年齢は、2022年4月1日から18歳になった。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "日本の民法上の成年年齢は18歳に引き下げられた。",
+              "verification_target": "法務省「民法の一部を改正する法律（成年年齢関係）について」に記載された改正内容。",
+              "status": "SUPPORTED"
+            },
+            {
+              "sub_claim": "成年年齢を18歳に引き下げる改正は2022年4月1日に施行された。",
+              "verification_target": "法務省の改正法案内に記載された施行日、および消費者庁「『18歳から大人』特設ページについて」の実施時期。",
+              "status": "SUPPORTED"
+            }
+          ],
+          "alignment_reasoning": "第1段階：成年年齢の変更内容と施行日の二つに分解した。第2段階：ウェブ検索で法務省と消費者庁の公式資料を取得した。法務省は成年年齢を20歳から18歳に引き下げる法律が令和4年4月1日から施行されたと説明し、消費者庁も2022年4月1日からの引下げを明記している。第3段階：すべての重要な下位主張が取得資料と一致するため、主張は裏付けられていると判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": null,
+        "correction": null,
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "法務省：民法の一部を改正する法律（成年年齢関係）について",
+            "url": "https://www.moj.go.jp/MINJI/minji07_00218.html",
+            "snippet": "平成３０年６月１３日、民法の成年年齢を２０歳から１８歳に引き下げること等を内容とする民法の一部を改正する法律が成立し、令和４年４月１日から施行されました。",
+            "verified": true
+          },
+          {
+            "title": "「18歳から大人」特設ページについて | 消費者庁",
+            "url": "https://www.caa.go.jp/policies/policy/consumer_education/consumer_education/lower_the_age_of_adulthood/introduction/",
+            "snippet": "2022年4月1日から民法上の成年年齢が20歳から18歳に引き下げられました。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": null,
+        "limitations": []
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 13.013
+    },
+    {
+      "case": {
+        "id": "C5",
+        "kind": "CORRECT",
+        "claim": "東海道新幹線は1964年10月1日に開業した。",
+        "groundTruth": "正しい",
+        "primarySource": "https://jr-central.co.jp/news/release/_pdf/000043174.pdf"
+      },
+      "result": {
+        "request_id": "d410196d-5856-453a-ba2d-64a664c2694e",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "SUPPORTED_CLAIM",
+        "evidence_status": "VERIFIED",
+        "severity_score": null,
+        "category": null,
+        "ttl_category": "HISTORICAL_FACT",
+        "verified_at": "2026-10-14T16:44:35.343Z",
+        "expires_at": "2026-11-13T16:44:35.343Z",
+        "evidence_checked_at": "2026-10-14T16:44:35.343Z",
+        "normalized_claim": "東海道新幹線は1964年10月1日に開業した。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "東海道新幹線の開業日は1964年10月1日である。",
+              "verification_target": "ＪＲ東海の「東海道新幹線 開業６０周年にあたって」および国立公文書館の開通記録。",
+              "status": "SUPPORTED"
+            }
+          ],
+          "alignment_reasoning": "第1段階：検証対象を東海道新幹線の開業日という単一の事実に分解した。第2段階：ウェブ検索で取得したＪＲ東海の公式発表は1964年10月1日の開業を明記しており、国立公文書館の記録も同日の開通を記している。第3段階：主張の全体が取得資料と一致するため、SUPPORTED_CLAIMと判定した。",
+          "abstention_reason": null
+        },
+        "hallucinated_claim": null,
+        "correction": null,
+        "unverified_notes": null,
+        "evidence_sources": [
+          {
+            "title": "東海道新幹線　開業６０周年にあたって",
+            "url": "https://jr-central.co.jp/news/release/_pdf/000043174.pdf",
+            "snippet": "東海道新幹線は、１９６４年１０月１日に開業して以来",
+            "verified": true
+          },
+          {
+            "title": "昭和39年（1964）10月｜東海道新幹線が開通する：日本のあゆみ",
+            "url": "https://www.archives.go.jp/ayumi/kobetsu/s39_1964_03.html",
+            "snippet": "昭和39年（1964）10月1日、東京～大阪間の東海道新幹線が開通しました。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": null,
+        "limitations": []
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 13.945
+    },
+    {
+      "case": {
+        "id": "A1",
+        "kind": "AMBIGUOUS",
+        "claim": "日本の総人口は2040年に1億人を下回る。",
+        "groundTruth": "将来の人口であり、推計はあっても現時点で事実として確定できない"
+      },
+      "result": {
+        "request_id": "1641381b-659d-4b62-adb2-2f1296481b33",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "UNVERIFIED_OR_AMBIGUOUS",
+        "evidence_status": "INSUFFICIENT",
+        "severity_score": null,
+        "category": null,
+        "ttl_category": "CURRENT_NEWS",
+        "verified_at": "2026-10-14T16:44:48.532Z",
+        "expires_at": "2026-10-14T17:44:48.532Z",
+        "evidence_checked_at": "2026-10-14T16:44:48.532Z",
+        "normalized_claim": "日本の総人口は2040年に1億人を下回る。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "2040年の日本の総人口は1億人未満になる。",
+              "verification_target": "国立社会保障・人口問題研究所「日本の将来推計人口（令和5年推計）」の表1-1、および2040年の実際の総人口。",
+              "status": "UNVERIFIABLE"
+            }
+          ],
+          "alignment_reasoning": "第1段階：対象年、人口の範囲、閾値を含む一つの予測として整理した。第2段階：公的推計の原資料を取得した。出生中位・死亡中位推計では、2040年の総人口は1億1283万7千人で、1億人を下回るのは2056年とされており、主張はこの推計と一致しない。第3段階：ただし、主張は特定の公的推計を引用したものとは明示されていない。2040年の実測値はまだ存在しないため、将来予測そのものの真偽は確定せず、判定を保留する。",
+          "abstention_reason": "2040年は監査時点の2026年10月14日より未来であり、実際の人口は確認できない。公的推計との不一致だけでは、出典や前提の示されていない予測を確定的な誤りとは認定できない。"
+        },
+        "hallucinated_claim": null,
+        "correction": null,
+        "unverified_notes": "取得した2023年公表の公的推計は、この主張を支持していない。同推計の出生中位・死亡中位の仮定では、2040年は約1億1284万人、1億人を下回る年は2056年である。これは仮定に基づく見通しであり、将来の実測値ではない。",
+        "evidence_sources": [
+          {
+            "title": "日本の将来推計人口（全国）｜国立社会保障・人口問題研究所",
+            "url": "https://www.ipss.go.jp/pp-zenkoku/j/zenkoku2023/pp_zenkoku2023.asp",
+            "snippet": "複数の仮定に基づく複数の推計によって、将来の人口推移について一定幅の見通しを与えています。",
+            "verified": true
+          },
+          {
+            "title": "日本の将来推計人口（令和5年推計）結果の概要",
+            "url": "https://www.ipss.go.jp/pp-zenkoku/j/zenkoku2023/pp2023_gaiyou.pdf",
+            "snippet": "表1-1の2040年の総人口は112,837千人。本文では、出生中位推計について「2056年には１億人を割って9,965万人」と記載。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": null,
+        "limitations": [
+          "主張には出典、推計の公表年、出生・死亡・国際人口移動の仮定が示されていない。",
+          "公的な将来推計は条件付きの見通しであり、2040年の実際の人口を確定する証拠ではない。"
+        ]
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 20.492
+    },
+    {
+      "case": {
+        "id": "A2",
+        "kind": "AMBIGUOUS",
+        "claim": "2030年の東京の夏は、観測史上最も暑い夏になる。",
+        "groundTruth": "未来の気象であり、検証できない"
+      },
+      "result": {
+        "request_id": "e92a7c4f-65c2-4a66-a075-5198f7d6861f",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "UNVERIFIED_OR_AMBIGUOUS",
+        "evidence_status": "INSUFFICIENT",
+        "severity_score": null,
+        "category": null,
+        "ttl_category": "CURRENT_NEWS",
+        "verified_at": "2026-10-14T16:44:54.406Z",
+        "expires_at": "2026-10-14T17:44:54.406Z",
+        "evidence_checked_at": "2026-10-14T16:44:54.406Z",
+        "normalized_claim": "2030年の東京の夏は、観測史上最も暑い夏になる。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "2030年の東京の夏の暑さが、それ以前の観測記録の最高値を更新する。",
+              "verification_target": "気象庁の東京の2030年夏の観測統計と過去の同一指標の記録、および2030年夏を対象とする公的な予測資料。",
+              "status": "UNVERIFIABLE"
+            }
+          ],
+          "alignment_reasoning": "第1段階：検証対象を、2030年の東京の夏が過去の暑さの記録を更新するという一つの比較主張として整理した。第2段階：気象庁の季節予報の対象期間・予測方法を検索して確認した。季節予報はおよそ2週間から半年先までを対象とし、平均的な天候を確率で示すものであり、この主張を支持する2030年夏の予測は今回取得した資料にはなかった。第3段階：監査基準日の2026年10月14日時点で2030年の夏は未来であり、観測結果による比較はできない。主張を否定する観測結果もないため、虚偽と確定せず、未検証の予測と判定した。",
+          "abstention_reason": "未来の観測記録についての断定であり、取得した資料では支持も反証もできない。また、「最も暑い」の判定指標と「東京」の対象範囲が指定されていない。"
+        },
+        "hallucinated_claim": null,
+        "correction": null,
+        "unverified_notes": "2030年の夏が実際に記録を更新する可能性は否定できないが、現時点で確定した事実として扱う根拠は確認できない。気象庁の通常の季節予報の対象期間を超えていること自体は、この予測が外れる証拠ではない。",
+        "evidence_sources": [
+          {
+            "title": "気象庁 | 気象庁情報カタログ",
+            "url": "https://www.data.jma.go.jp/suishin/cgi-bin/catalogue/make_product_page.cgi?id=Kisetsu",
+            "snippet": "およそ２週間から半年先までの平均的な気温や降水量などの天候の特徴を、平年との隔たりを用いて予報します。",
+            "verified": true
+          },
+          {
+            "title": "季節予報って何？ | 気象庁",
+            "url": "https://www.jma.go.jp/jma/kishou/know/kisetsu_riyou/index.html",
+            "snippet": "予報期間が長いため、３つの階級や確率を使って、期間や地域を平均した天候を予報します。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": null,
+        "limitations": [
+          "2030年夏の観測結果は、監査基準日時点では存在しない。",
+          "暑さの指標が夏季平均気温、最高気温、猛暑日日数などのどれか不明である。",
+          "東京が特定の観測地点を指すのか、東京都全域を指すのか不明である。",
+          "元の主張には予測モデル、発表機関、発表日、確率などの根拠が提示されていない。"
+        ]
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 22.188
+    },
+    {
+      "case": {
+        "id": "A3",
+        "kind": "AMBIGUOUS",
+        "claim": "寿司は世界で最もおいしい料理である。",
+        "groundTruth": "価値判断であり、事実として検証できない"
+      },
+      "result": null,
+      "downgraded": false,
+      "error": "InvalidClaimError: no checkable factual claim was found in the input",
+      "seconds": 11.017
+    },
+    {
+      "case": {
+        "id": "A4",
+        "kind": "AMBIGUOUS",
+        "claim": "邪馬台国は九州にあった。",
+        "groundTruth": "所在地は学説が分かれ、確定していない"
+      },
+      "result": {
+        "request_id": "2a384e46-309e-4206-81ce-11fe9f35b892",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "UNVERIFIED_OR_AMBIGUOUS",
+        "evidence_status": "INSUFFICIENT",
+        "severity_score": null,
+        "category": null,
+        "ttl_category": "HISTORICAL_FACT",
+        "verified_at": "2026-10-14T16:45:09.863Z",
+        "expires_at": "2026-11-13T16:45:09.863Z",
+        "evidence_checked_at": "2026-10-14T16:45:09.863Z",
+        "normalized_claim": "邪馬台国は九州にあった。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "邪馬台国の所在地は九州だった。",
+              "verification_target": "吉野ヶ里歴史公園「邪馬台国」の所在地論争解説、および宗像市「040 邪馬台国とムナカタ国」。",
+              "status": "UNVERIFIABLE"
+            }
+          ],
+          "alignment_reasoning": "手順1：所在地が九州だったという単一の事実主張として分解した。手順2：歴史公園と自治体の解説を検索・取得した。吉野ヶ里歴史公園は九州説と近畿説を有力な説として紹介し、宗像市も所在地が確定したとはしていない。手順3：九州説の存在は確認できるが、それが史実であることの証明とは区別する必要がある。取得資料は九州所在を確定も否定もしていないため、判断を留保する。",
+          "abstention_reason": "取得した資料では所在地を一意に確定できず、九州説を支持する説の存在だけでは、主張全体を事実として認定できない。一方、九州所在を否定する決定的な証拠も取得していない。"
+        },
+        "hallucinated_claim": null,
+        "correction": null,
+        "unverified_notes": "九州説は有力な説の一つとして紹介されているが、近畿説も併記されている。「邪馬台国は九州にあった」という断定は、今回確認した資料の裏付けを超えている。ただし、断定の根拠が不足していることと、主張が誤りだと証明されたことは同じではない。",
+        "evidence_sources": [
+          {
+            "title": "邪馬台国 | 弥生ミュージアム",
+            "url": "https://www.yoshinogari.jp/ym/topics/yama01.html",
+            "snippet": "その所在地を廻って様々な説が提出されていますが、「近畿説」と「九州説」が最も有力とされています。",
+            "verified": true
+          },
+          {
+            "title": "040　邪馬台国とムナカタ国 / 海の道むなかた館 / 福岡県宗像市公式サイト",
+            "url": "https://www.city.munakata.lg.jp/searoad/kiji0034337/index.html",
+            "snippet": "畿内説が有利ともいわれますが、確定されたわけではなく、九州説は健在です。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": null,
+        "limitations": [
+          "今回の確認は公的機関の解説を中心としており、個々の発掘調査報告書や学術論文を網羅した検証ではない。",
+          "宗像市の解説は2014年7月15日更新であり、それ以降の研究成果を網羅する資料ではない。"
+        ]
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 23.502
+    },
+    {
+      "case": {
+        "id": "A5",
+        "kind": "AMBIGUOUS",
+        "claim": "次の衆議院議員総選挙では、与党が過半数の議席を維持する。",
+        "groundTruth": "未来の選挙結果であり、検証できない"
+      },
+      "result": {
+        "request_id": "0c970394-6978-41a8-9b14-0427510d7eb3",
+        "mode": "LIVE",
+        "auditor": {
+          "provider": "OPENAI",
+          "model": "gpt-6-astra"
+        },
+        "is_valid_input": true,
+        "contains_pii": false,
+        "audit_status": "UNVERIFIED_OR_AMBIGUOUS",
+        "evidence_status": "INSUFFICIENT",
+        "severity_score": null,
+        "category": null,
+        "ttl_category": "CURRENT_NEWS",
+        "verified_at": "2026-10-14T16:45:10.527Z",
+        "expires_at": "2026-10-14T17:45:10.527Z",
+        "evidence_checked_at": "2026-10-14T16:45:10.527Z",
+        "normalized_claim": "次の衆議院議員総選挙では、与党が過半数の議席を維持する。",
+        "context_fingerprint": "dfb986668d6739b9240310e10d66dc69eaec2266c9f5cab3f7dad986fef009be",
+        "audit_trace": {
+          "decomposed_claims": [
+            {
+              "sub_claim": "次の衆議院議員総選挙で、与党の獲得議席数が総議席数の半数を超える。",
+              "verification_target": "対象となる衆議院議員総選挙の確定結果と、その選挙時点の与党の構成。",
+              "status": "UNVERIFIABLE"
+            },
+            {
+              "sub_claim": "「維持する」の前提として、発言時点で与党が衆議院の過半数を保有している。",
+              "verification_target": "発言時点の衆議院会派別所属議員数と与党の構成。",
+              "status": "UNVERIFIABLE"
+            }
+          ],
+          "alignment_reasoning": "第1段階：将来の選挙結果に関する予測と、現在の過半数保有という前提に分解した。第2段階：衆議院公式の「国会の構成」と「会派名及び会派別所属議員数」を検索・取得した。前者は定数465名、後者は2026年9月28日現在の会派別議員数を示すが、次回選挙の結果を裏付ける資料ではない。また、発言日時と「与党」の範囲が不明なため、発言時点の前提も確定できない。第3段階：取得資料による反証はなく、予測の実現も確認できないため、未検証・曖昧と判定する。",
+          "abstention_reason": "将来の選挙結果に関する予測であり、現在の議席数から結果を確定することはできない。発言日時と対象選挙も明示されていない。"
+        },
+        "hallucinated_claim": null,
+        "correction": null,
+        "unverified_notes": "この断定を、確認済みの事実として扱うことはできない。ただし、未確定の予測であることだけを理由に、誤りや捏造と認定することもできない。",
+        "evidence_sources": [
+          {
+            "title": "国会の構成",
+            "url": "https://www.shugiin.go.jp/internet/itdb_annai.nsf/html/statics/kokkai/kokkai_kousei.htm",
+            "snippet": "衆議院の定数は465名。任期は4年で、解散すれば地位を失う。",
+            "verified": true
+          },
+          {
+            "title": "会派名及び会派別所属議員数",
+            "url": "https://www.shugiin.go.jp/Internet/itdb_annai.nsf/html/statics/shiryo/kaiha_m.htm",
+            "snippet": "令和8年9月28日現在。自由民主党・無所属の会315名、日本維新の会36名。",
+            "verified": true
+          }
+        ],
+        "estimated_error_pattern": null,
+        "limitations": [
+          "発言日時がなく、「次の」総選挙を一意に特定できない。",
+          "「与党」に含まれる政党が明示されていない。",
+          "取得した会派別議員数は特定時点の現状資料であり、将来の選挙結果を保証しない。"
+        ]
+      },
+      "downgraded": false,
+      "error": null,
+      "seconds": 21.995
+    }
+  ],
+  "sources": [
+    {
+      "caseId": "E1",
+      "url": "https://www.ndl.go.jp/constitution/gaisetsu/05gaisetsu.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "E1",
+      "url": "https://www.archives.go.jp/owning/mini_img/1-4.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "E2",
+      "url": "https://www.tokyo-skytree.jp/about/spec/",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "E3",
+      "url": "https://www.mof.go.jp/tax_policy/summary/consumption/d05_1.pdf",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": null
+    },
+    {
+      "caseId": "E3",
+      "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shohi/6102.htm",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "E4",
+      "url": "https://www.mhlw.go.jp/shingi/2004/08/s0824-4c.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "E4",
+      "url": "https://www.ppc.go.jp/files/pdf/kouteki_gaiyou_R802.pdf",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": null
+    },
+    {
+      "caseId": "E5",
+      "url": "https://maps.gsi.go.jp/3d/mountain/mountain.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "E5",
+      "url": "https://web1.gsi.go.jp/WNEW/PRESS-RELEASE/keikaku61003.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "E6",
+      "url": "https://www.digital.go.jp/policies/mynumber_faq_01",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "E7",
+      "url": "https://www.moj.go.jp/MINJI/minji07_00218.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "E8",
+      "url": "https://www.archives.go.jp/ayumi/kobetsu/s39_1964_03.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "E8",
+      "url": "https://www.mlit.go.jp/hakusyo/mlit/h27/hakusho/h28/html/n1121000.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "E8",
+      "url": "https://www.mofa.go.jp/mofaj/gaiko/hakurankai/banpaku/nihon.html",
+      "verified": true,
+      "status": 403,
+      "alive": false,
+      "snippetMatch": null
+    },
+    {
+      "caseId": "C1",
+      "url": "https://www.ndl.go.jp/constitution/gaisetsu/05gaisetsu.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "C1",
+      "url": "https://www.shugiin.go.jp/internet/itdb_annai.nsf/html/statics/shiryo/dl-constitution.htm",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "C2",
+      "url": "https://www.tokyo-skytree.jp/about/outline/",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "C3",
+      "url": "https://www.digital.go.jp/policies/mynumber_faq_02",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "C3",
+      "url": "https://www.digital.go.jp/policies/mynumber_faq_01",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "C4",
+      "url": "https://www.moj.go.jp/MINJI/minji07_00218.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "C4",
+      "url": "https://www.caa.go.jp/policies/policy/consumer_education/consumer_education/lower_the_age_of_adulthood/introduction/",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "C5",
+      "url": "https://jr-central.co.jp/news/release/_pdf/000043174.pdf",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": null
+    },
+    {
+      "caseId": "C5",
+      "url": "https://www.archives.go.jp/ayumi/kobetsu/s39_1964_03.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "A1",
+      "url": "https://www.ipss.go.jp/pp-zenkoku/j/zenkoku2023/pp_zenkoku2023.asp",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "A1",
+      "url": "https://www.ipss.go.jp/pp-zenkoku/j/zenkoku2023/pp2023_gaiyou.pdf",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": null
+    },
+    {
+      "caseId": "A2",
+      "url": "https://www.data.jma.go.jp/suishin/cgi-bin/catalogue/make_product_page.cgi?id=Kisetsu",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "A2",
+      "url": "https://www.jma.go.jp/jma/kishou/know/kisetsu_riyou/index.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "A4",
+      "url": "https://www.yoshinogari.jp/ym/topics/yama01.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "A4",
+      "url": "https://www.city.munakata.lg.jp/searoad/kiji0034337/index.html",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    },
+    {
+      "caseId": "A5",
+      "url": "https://www.shugiin.go.jp/internet/itdb_annai.nsf/html/statics/kokkai/kokkai_kousei.htm",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": false
+    },
+    {
+      "caseId": "A5",
+      "url": "https://www.shugiin.go.jp/Internet/itdb_annai.nsf/html/statics/shiryo/kaiha_m.htm",
+      "verified": true,
+      "status": 200,
+      "alive": true,
+      "snippetMatch": true
+    }
+  ],
+  "pairs": [
+    {
+      "case": {
+        "id": "K1",
+        "variation": "NUMBER",
+        "a": {
+          "claim": "東京スカイツリーの高さは634メートルである。"
+        },
+        "b": {
+          "claim": "東京スカイツリーの高さは643メートルである。"
+        }
+      },
+      "keyA": "c2347abbe7a4ef946e0d237387c6a6a88a97c47431f1a933362dc7a0ee669815",
+      "keyB": "c9612335065707e8d75c916a644286a8c4ce5e0fed370e22a42c7fbfdf79aa42"
+    },
+    {
+      "case": {
+        "id": "K2",
+        "variation": "NEGATION",
+        "a": {
+          "claim": "東海道新幹線は1964年に開業した。"
+        },
+        "b": {
+          "claim": "東海道新幹線は1964年に開業しなかった。"
+        }
+      },
+      "keyA": "fc782b973e8053b0c5da991a490d4a4ddc71f7644eabed8ea5e2904e0f87b532",
+      "keyB": "b04d9dc412d49f63f7fbbf699611a01759876764075585a5a14cbab6cede54dc"
+    },
+    {
+      "case": {
+        "id": "K-ctx",
+        "variation": "CONTEXT",
+        "a": {
+          "claim": "この制度は2022年に始まった。",
+          "context": "質問: 成年年齢の引き下げはいつ？"
+        },
+        "b": {
+          "claim": "この制度は2022年に始まった。",
+          "context": "質問: インボイス制度はいつ始まった？"
+        }
+      },
+      "keyA": "7492fca3eea5576f6bab2e8cc97b1ebb47858146a346e1b3beb4aaa7c8affc26",
+      "keyB": "689c3f761ed958e8da87c5c320d35c896caac401511f58bfe61c168e0fb07f09"
+    }
+  ]
+}
