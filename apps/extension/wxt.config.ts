@@ -18,7 +18,7 @@ export default defineConfig({
     name: "GeminiHall",
     version: VERSION,
     version_name: `${VERSION} ${CHANNEL} ${BUILD_STAMP}`,
-    description: "AIの回答を、あなた自身のAPIキーで根拠付きに監査します。",
+    description: "AIの回答を、検索で取得した資料と照合して監査します。ChatGPT のログイン（試作）か、自分の API キーで使えます。",
     permissions: ["storage", "sidePanel", "contextMenus", "declarativeNetRequest"],
     host_permissions: [
       "https://api.anthropic.com/*",

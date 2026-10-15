@@ -75,11 +75,11 @@ function errorDetail(err: unknown): string | undefined {
   return parts.join(" / ");
 }
 
-function classify(err: unknown): { kind: JobErrorKind; message: string; status?: number; detail?: string } {
-  return { ...classifyBase(err), detail: errorDetail(err) };
+function classify(err: unknown, usePlan: boolean): { kind: JobErrorKind; message: string; status?: number; detail?: string } {
+  return { ...classifyBase(err, usePlan), detail: errorDetail(err) };
 }
 
-function classifyBase(err: unknown): { kind: JobErrorKind; message: string; status?: number } {
+function classifyBase(err: unknown, usePlan: boolean): { kind: JobErrorKind; message: string; status?: number } {
   if (err instanceof UpstreamError && err.code && PLAN_ERROR_MESSAGES[err.code]) {
     return { kind: "UPSTREAM_AI_UNAVAILABLE", status: err.status, message: PLAN_ERROR_MESSAGES[err.code]! };
   }
@@ -89,7 +89,16 @@ function classifyBase(err: unknown): { kind: JobErrorKind; message: string; stat
   if (err instanceof UpstreamError) {
     const status = err.status;
     if (status === 401 || status === 403) {
-      return { kind: "UPSTREAM_AI_UNAVAILABLE", status, message: "APIキーが受け付けられませんでした。設定を確認してください。" };
+      return {
+        kind: "UPSTREAM_AI_UNAVAILABLE",
+        status,
+        message: usePlan
+          ? "ChatGPT のログインが受け付けられませんでした。設定画面からもう一度ログインしてください。"
+          : "APIキーが受け付けられませんでした。設定を確認してください。",
+      };
+    }
+    if (status === 429 && usePlan) {
+      return { kind: "UPSTREAM_AI_UNAVAILABLE", status, message: PLAN_ERROR_MESSAGES.subscription_sharing_usage_limit_exceeded! };
     }
     if (status === 404) {
       return { kind: "UPSTREAM_AI_UNAVAILABLE", status, message: "指定したモデルが見つかりませんでした。設定のモデル名を確認してください。" };
@@ -227,7 +236,7 @@ async function startAudit(claim: string, context: string | undefined, force: boo
       if (usePlan && err instanceof UpstreamError && (err.status === 401 || err.code === "subscription_sharing_invalid_user")) {
         await invalidateSession("ChatGPT のログインが無効になりました。もう一度ログインしてください。");
       }
-      await writeJob({ ...base, state: "FAILED", finishedAt: new Date().toISOString(), error: classify(err) });
+      await writeJob({ ...base, state: "FAILED", finishedAt: new Date().toISOString(), error: classify(err, usePlan) });
     } finally {
       clearInterval(keepalive);
       runningInThisWorker.delete(requestId);
