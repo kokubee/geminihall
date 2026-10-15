@@ -346,6 +346,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (changes[SESSION_KEYS.pendingInput]?.newValue) void applyPendingInput();
 });
 
+const manifest = chrome.runtime.getManifest() as chrome.runtime.Manifest & { version_name?: string };
+$<HTMLSpanElement>("app-version").textContent = `v${manifest.version_name ?? manifest.version}`;
+
 async function init() {
   settings = await loadSettings();
   fillSettingsForm();

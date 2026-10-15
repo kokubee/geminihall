@@ -157,3 +157,4 @@ button.chatgpt { background: #0d0d0d; color: #ffffff; border-color: #0d0d0d; fon
 @media (prefers-color-scheme: dark) { button.chatgpt { background: #ffffff; color: #0d0d0d; border-color: #ffffff; } }
 .welcome { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin: 6px 0; font-size: 13px; background: var(--surface); }
 .welcome p { margin: 4px 0; }
+.version { display: block; font-size: 11px; color: var(--muted); }
