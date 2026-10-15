@@ -122,7 +122,7 @@ export interface AuditJob {
   claimCacheKey?: string;
   downgraded?: boolean;
   submission?: SubmissionInfo;
-  error?: { kind: JobErrorKind; message: string; status?: number };
+  error?: { kind: JobErrorKind; message: string; status?: number; detail?: string };
 }
 
 export interface PendingInput {

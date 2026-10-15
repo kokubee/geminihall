@@ -275,6 +275,7 @@ function renderJob(job: AuditJob | undefined) {
   if (job.state === "FAILED" || job.state === "INTERRUPTED") {
     statusEl.hidden = false;
     statusEl.append(h("p", { class: "error" }, job.error?.message ?? "監査に失敗しました。"));
+    if (job.error?.detail) statusEl.append(h("p", { class: "hint" }, `詳細: ${job.error.detail}`));
     if (job.error?.kind === "NO_API_KEY" || job.error?.status === 401 || job.error?.status === 404) settingsPanel.open = true;
     return;
   }

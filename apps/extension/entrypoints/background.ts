@@ -62,7 +62,24 @@ const PLAN_ERROR_MESSAGES: Record<string, string> = {
   subscription_sharing_invalid_user: "ChatGPT のログイン情報を確認できませんでした。もう一度ログインしてください。",
 };
 
-function classify(err: unknown): { kind: JobErrorKind; message: string; status?: number } {
+const SECRET_LIKE = /(Bearer\s+\S+|sk-[A-Za-z0-9_-]{8,}|eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)/gu;
+
+function errorDetail(err: unknown): string | undefined {
+  if (!(err instanceof Error)) return undefined;
+  const parts: string[] = [err.name];
+  if (err instanceof UpstreamError) {
+    if (err.status) parts.push(`HTTP ${err.status}`);
+    if (err.code) parts.push(err.code);
+  }
+  parts.push(err.message.replace(SECRET_LIKE, "[redacted]").slice(0, 200));
+  return parts.join(" / ");
+}
+
+function classify(err: unknown): { kind: JobErrorKind; message: string; status?: number; detail?: string } {
+  return { ...classifyBase(err), detail: errorDetail(err) };
+}
+
+function classifyBase(err: unknown): { kind: JobErrorKind; message: string; status?: number } {
   if (err instanceof UpstreamError && err.code && PLAN_ERROR_MESSAGES[err.code]) {
     return { kind: "UPSTREAM_AI_UNAVAILABLE", status: err.status, message: PLAN_ERROR_MESSAGES[err.code]! };
   }
