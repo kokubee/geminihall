@@ -1,0 +1,17 @@
+Adding another data point to this question.
+
+I maintain GeminiHall (kokubee/geminihall on GitHub), a free, MIT-licensed Chrome extension that audits claims made by AI assistants against sources retrieved through web search. We prototyped ChatGPT plan usage with the open-source Sign in with ChatGPT flow, and it works end to end on a real ChatGPT account:
+
+- First-time registration with `client_id=dynamic_agent_client`, `agent_name_hint`, and one `ext_agent_host_id` per Chrome profile; later sign-ins reuse the issued client ID.
+- `redirect_uri` is `http ://127.0.0.1:<random port>/auth/callback` (space added to avoid auto-linking). The callback is intercepted inside the browser by a one-time declarativeNetRequest session rule that redirects it to an extension page, so nothing is actually sent to the loopback port.
+- PKCE, state and nonce; the ID token is validated against the published JWKS, and we check for `chatgpt.tokens.use.direct` before any inference.
+- Inference via `POST /v1/responses` with `stream: true` and `store: false`, using the `web_search` tool and a `json_schema` text format.
+
+Questions for the OpenAI team:
+
+1. Does a free, open-source Chrome extension distributed through the Chrome Web Store qualify for self-serve plan usage, or should we use the interest form?
+2. Is intercepting the loopback callback with declarativeNetRequest acceptable, or is there a supported extension redirect (for example the `chrome.identity` redirect URL on the chromiumapp domain) for this flow?
+3. The credential security guidance says to keep tokens out of browser storage, but an extension has no storage outside the browser. In our prototype the access and refresh tokens live only in `chrome.storage.session` (in memory, cleared when the browser closes or the extension reloads); only the issued client ID, the account's sub and email, and the host ID are persisted. Is this acceptable, or should extensions avoid this flow until there is guidance?
+4. One undocumented difference we ran into: on the plan route, a plain string input is rejected with 400 `{"detail":"Input must be a list"}`, while a list of message items works. It may be worth adding to the docs.
+
+The feature stays behind a build flag and is off in our default build until we hear back. Thanks!
