@@ -23,3 +23,26 @@ describe("structured output schema", () => {
     visit(auditOutputJsonSchema());
   });
 });
+
+import { ModelOutputError, extractJsonText } from "../src/index";
+import { parseModelJson } from "../src/provider";
+
+describe("model JSON extraction", () => {
+  it("unwraps code fences and surrounding prose", () => {
+    expect(extractJsonText('```json\n{"a":1}\n```')).toBe('{"a":1}');
+    expect(extractJsonText('Here is the audit:\n{"a":1}\nThanks')).toBe('{"a":1}');
+    expect(extractJsonText('{"a":1}')).toBe('{"a":1}');
+  });
+
+  it("reports length and a redacted preview when parsing fails", () => {
+    try {
+      parseModelJson("Sorry, Bearer abcdefghijklmnop cannot help");
+      throw new Error("should fail");
+    } catch (e) {
+      expect(e).toBeInstanceOf(ModelOutputError);
+      expect((e as Error).message).toContain("length");
+      expect((e as Error).message).toContain("[redacted]");
+      expect((e as Error).message).not.toContain("abcdefghijklmnop");
+    }
+  });
+});

@@ -266,7 +266,7 @@ await check("受入(公開照会): 公開辞典に事例があればAIを呼ば�
     const norm = c.normalize("NFKC").trim().replace(/\s+/gu, " ").toLowerCase();
     const hex = async (t) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)))].map((b) => b.toString(16).padStart(2, "0")).join("");
     const fp = await hex("ctx-v1|");
-    return hex([norm, fp, "2026-10-15.3", "ja"].join("|"));
+    return hex([norm, fp, "2026-10-15.4", "ja"].join("|"));
   }, claim);
   const out = modelOutput([SOURCE]);
   publicEntries.set(key, {

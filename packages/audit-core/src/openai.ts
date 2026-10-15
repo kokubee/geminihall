@@ -76,11 +76,13 @@ async function runStreaming(
   client: OpenAI,
   params: OpenAI.Responses.ResponseCreateParamsNonStreaming,
   signal: AbortSignal | undefined,
-): Promise<OpenAI.Responses.Response> {
+): Promise<{ response: OpenAI.Responses.Response; streamedText: string }> {
   const stream = await client.responses.create({ ...params, stream: true }, signal ? { signal } : undefined);
   let completed: OpenAI.Responses.Response | null = null;
+  let streamedText = "";
   for await (const event of stream) {
-    if (event.type === "response.completed") completed = event.response;
+    if (event.type === "response.output_text.delta") streamedText += event.delta;
+    else if (event.type === "response.completed") completed = event.response;
     else if (event.type === "response.failed") {
       const e = event.response.error;
       throw new UpstreamError(e?.message ?? "the audit failed", undefined, e?.code ?? undefined);
@@ -91,7 +93,7 @@ async function runStreaming(
     }
   }
   if (!completed) throw new UpstreamError("the stream ended before the audit completed");
-  return completed;
+  return { response: completed, streamedText };
 }
 
 export const openaiAdapter: ProviderAdapter = {
@@ -123,9 +125,10 @@ export const openaiAdapter: ProviderAdapter = {
     };
 
     let response: OpenAI.Responses.Response;
+    let streamedText = "";
     try {
       if (req.credential.kind === "CHATGPT_PLAN") {
-        response = await runStreaming(client, params, req.signal);
+        ({ response, streamedText } = await runStreaming(client, params, req.signal));
       } else {
         response = await client.responses.create(params, req.signal ? { signal: req.signal } : undefined);
       }
@@ -139,7 +142,7 @@ export const openaiAdapter: ProviderAdapter = {
     }
     if (response.status === "failed") throw new UpstreamError(response.error?.message ?? "the audit failed", undefined, response.error?.code ?? undefined);
 
-    const text = outputText(response.output);
+    const text = outputText(response.output) || streamedText;
     const { urls, searchUsed } = openaiRetrievedUrls(response.output);
     return { output: stripInlineCitations(parseModelJson(text)), retrievedUrls: urls, searchUsed };
   },

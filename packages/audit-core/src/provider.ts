@@ -33,12 +33,28 @@ export function auditOutputJsonSchema(): Record<string, unknown> {
   return schema;
 }
 
+const SECRET_LIKE = /(Bearer\s+\S+|sk-[A-Za-z0-9_-]{8,}|eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)/gu;
+
+function preview(text: string): string {
+  return text.replace(SECRET_LIKE, "[redacted]").replace(/\s+/gu, " ").slice(0, 120);
+}
+
+export function extractJsonText(text: string): string {
+  const trimmed = text.trim();
+  const fenced = /^```(?:json)?\s*([\s\S]*?)\s*```$/u.exec(trimmed);
+  if (fenced) return fenced[1]!;
+  if (trimmed.startsWith("{")) return trimmed;
+  const start = trimmed.indexOf("{");
+  const end = trimmed.lastIndexOf("}");
+  return start >= 0 && end > start ? trimmed.slice(start, end + 1) : trimmed;
+}
+
 export function parseModelJson(text: string): ModelAuditOutput {
   let json: unknown;
   try {
-    json = JSON.parse(text.trim());
+    json = JSON.parse(extractJsonText(text));
   } catch {
-    throw new ModelOutputError("model output is not valid JSON");
+    throw new ModelOutputError(`model output is not valid JSON (length ${text.length}: "${preview(text)}")`);
   }
   const parsed = ModelAuditOutputSchema.safeParse(json);
   if (!parsed.success) throw new ModelOutputError(`model output failed schema: ${parsed.error.message}`);

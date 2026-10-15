@@ -1,7 +1,7 @@
 import type { AuditInput } from "@geminihall/schema";
 import { claimCacheKey, contextFingerprint, normalizeText } from "./normalize";
 
-export const AUDIT_POLICY_VERSION = "2026-10-15.3";
+export const AUDIT_POLICY_VERSION = "2026-10-15.4";
 
 export interface CacheIdentity {
   normalizedClaim: string;

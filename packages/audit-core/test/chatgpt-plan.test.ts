@@ -105,3 +105,26 @@ describe("runAudit with a ChatGPT plan token", () => {
     ).rejects.toBeInstanceOf(UpstreamError);
   });
 });
+
+describe("plan route output recovery", () => {
+  it("uses streamed text deltas when the completed response carries no message text", async () => {
+    const full = openaiResponse(confirmedOutput([SOURCE]), [SOURCE]);
+    const text = JSON.stringify(confirmedOutput([SOURCE]));
+    const bare = { ...full, output: full.output.filter((o: { type: string }) => o.type !== "message") };
+    const out = await runAudit({
+      requestId: REQUEST_ID,
+      provider: "OPENAI",
+      credential: { kind: "CHATGPT_PLAN", accessToken: TOKEN },
+      model: "m",
+      input,
+      fetch: mockFetch([
+        sseResponse([
+          { type: "response.output_text.delta", sequence_number: 1, item_id: "m", output_index: 1, content_index: 0, delta: text.slice(0, 50), logprobs: [] },
+          { type: "response.output_text.delta", sequence_number: 2, item_id: "m", output_index: 1, content_index: 0, delta: text.slice(50), logprobs: [] },
+          { type: "response.completed", sequence_number: 3, response: bare },
+        ]),
+      ]),
+    });
+    expect(out.result.audit_status).toBe("CONFIRMED_HALLUCINATION");
+  });
+});
