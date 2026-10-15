@@ -5,6 +5,7 @@ import { lookupPublic, submissionStatus, submitForPublication } from "../lib/api
 import { getPrivate, putPrivate } from "../lib/cache";
 import { DEMO_CLAIM, demoResult } from "../lib/demo";
 import { KEY_LOSS_NOTE, loadApiKeys, loadSettings, wasKeyEntered } from "../lib/settings";
+import { SIWC_ENABLED } from "../lib/features";
 import { acknowledgeWelcome, accessToken, completeSignIn, invalidateSession, planModels, signOut, startSignIn } from "../lib/siwc-session";
 import {
   SESSION_KEYS,
@@ -166,7 +167,7 @@ async function startAudit(claim: string, context: string | undefined, force: boo
     }
   }
 
-  const usePlan = uiProvider === "CHATGPT_PLAN";
+  const usePlan = SIWC_ENABLED && uiProvider === "CHATGPT_PLAN";
   const apiKey = usePlan ? undefined : (await loadApiKeys())[provider];
   const planToken = usePlan ? await accessToken() : null;
   const credential: Credential | null = usePlan
@@ -311,6 +312,10 @@ export default defineBackground(() => {
 
   chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender, sendResponse) => {
     if (sender.id !== chrome.runtime.id || !sender.url?.startsWith(chrome.runtime.getURL(""))) return false;
+    if (!SIWC_ENABLED && message.type.startsWith("SIWC_")) {
+      sendResponse({ ok: false, reason: "SIWC_DISABLED" });
+      return false;
+    }
     switch (message.type) {
       case "START_AUDIT":
         void startAudit(message.claim, message.context, message.force === true).then(sendResponse);

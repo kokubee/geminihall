@@ -14,6 +14,7 @@ import {
   type UiProvider,
 } from "../../lib/state";
 import type { PlanModel } from "../../lib/siwc";
+import { SIWC_ENABLED } from "../../lib/features";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -35,6 +36,10 @@ const siwcWelcome = $<HTMLDivElement>("siwc-welcome");
 const siwcWelcomeOk = $<HTMLButtonElement>("siwc-welcome-ok");
 const planModelField = $<HTMLLabelElement>("plan-model-field");
 const planModelEl = $<HTMLSelectElement>("plan-model");
+if (!SIWC_ENABLED) {
+  providerEl.querySelector('option[value="CHATGPT_PLAN"]')?.remove();
+  siwcSection.remove();
+}
 const demoEl = $<HTMLInputElement>("demo-mode");
 const modeBadge = $<HTMLSpanElement>("mode-badge");
 const claimEl = $<HTMLTextAreaElement>("claim");
@@ -51,7 +56,7 @@ let timer: number | undefined;
 let currentJob: AuditJob | undefined;
 
 function isPlan() {
-  return providerEl.value === "CHATGPT_PLAN";
+  return SIWC_ENABLED && providerEl.value === "CHATGPT_PLAN";
 }
 
 function renderProviderFields() {
