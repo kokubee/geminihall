@@ -1,10 +1,10 @@
 import { DEFAULT_MODELS } from "@geminihall/audit-core/models";
 import type { Provider } from "@geminihall/schema";
-import { LOCAL_KEYS, SESSION_KEYS, type ApiKeys, type Settings } from "./state";
+import { LOCAL_KEYS, SESSION_KEYS, type ApiKeys, type Settings, type UiProvider } from "./state";
 
 export const DEFAULT_SETTINGS: Settings = {
   provider: "ANTHROPIC",
-  models: { ...DEFAULT_MODELS },
+  models: { ...DEFAULT_MODELS, CHATGPT_PLAN: "" },
   costNoticeAccepted: false,
   publicLookup: true,
   demoMode: false,
@@ -14,7 +14,9 @@ export async function loadSettings(): Promise<Settings> {
   const stored = await chrome.storage.local.get(LOCAL_KEYS.settings);
   const s = stored[LOCAL_KEYS.settings] as Partial<Settings> | undefined;
   return {
-    provider: s?.provider === "OPENAI" ? "OPENAI" : "ANTHROPIC",
+    provider: (["ANTHROPIC", "OPENAI", "CHATGPT_PLAN"] as UiProvider[]).includes(s?.provider as UiProvider)
+      ? (s!.provider as UiProvider)
+      : "ANTHROPIC",
     models: { ...DEFAULT_SETTINGS.models, ...(s?.models ?? {}) },
     costNoticeAccepted: s?.costNoticeAccepted === true,
     publicLookup: s?.publicLookup !== false,

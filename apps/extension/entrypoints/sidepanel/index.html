@@ -18,24 +18,48 @@
         <label class="field">
           <span>使うAI</span>
           <select id="provider">
-            <option value="ANTHROPIC">Claude（Anthropic）</option>
-            <option value="OPENAI">ChatGPT（OpenAI API）</option>
+            <option value="ANTHROPIC">Claude（APIキー）</option>
+            <option value="OPENAI">OpenAI（APIキー）</option>
+            <option value="CHATGPT_PLAN">ChatGPT（サブスクでログイン・試作）</option>
           </select>
         </label>
-        <label class="field">
-          <span>モデル名</span>
-          <input id="model" type="text" spellcheck="false" />
-        </label>
-        <label class="field">
-          <span>APIキー</span>
-          <input id="api-key" type="password" spellcheck="false" placeholder="未設定" />
-        </label>
-        <p id="key-status" class="hint"></p>
+        <div id="key-fields">
+          <label class="field">
+            <span>モデル名</span>
+            <input id="model" type="text" spellcheck="false" />
+          </label>
+          <label class="field">
+            <span>APIキー</span>
+            <input id="api-key" type="password" spellcheck="false" placeholder="未設定" />
+          </label>
+          <p id="key-status" class="hint"></p>
+        </div>
+        <div id="siwc-section" hidden>
+          <div class="key-notice">
+            <p><strong>試作機能です。</strong>ChatGPT Plus / Pro の利用枠で監査します。API キーは使いません。</p>
+            <p>OpenAI は、ログインで受け取る情報をブラウザに保存しないよう求めています。この試作では、ログインの情報をメモリ上にだけ置き、ディスクには保存しません。そのため、ブラウザを閉じたときや拡張機能を更新したときは、もう一度ログインが必要です。正式に提供するかどうかは、OpenAI の回答を待って決めます。</p>
+          </div>
+          <div id="siwc-welcome" class="welcome" hidden>
+            <p><strong>ChatGPT のプランを使っています</strong></p>
+            <p>この拡張機能での監査には、あなたの ChatGPT プランの利用枠が使われます。使用状況は ChatGPT の設定で管理できます。</p>
+            <button type="button" id="siwc-welcome-ok">了解</button>
+          </div>
+          <p id="siwc-status" class="hint"></p>
+          <div class="row">
+            <button type="button" id="siwc-login" class="chatgpt">Continue with ChatGPT</button>
+            <button type="button" id="siwc-logout" hidden>ログアウト</button>
+          </div>
+          <label class="field" id="plan-model-field" hidden>
+            <span>モデル</span>
+            <select id="plan-model"></select>
+          </label>
+          <p class="hint">Using ChatGPT plan ・ <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Manage usage</a>（ChatGPT の設定 → 使用状況）</p>
+        </div>
         <label class="check">
           <input id="public-lookup" type="checkbox" />
           <span>AIを呼ぶ前に、公開辞典に同じ事例がないか照会する（送るのは主張のハッシュ値だけです）</span>
         </label>
-        <div class="key-notice">
+        <div class="key-notice" id="key-notice">
           <p><strong>キーは次のときに消えます。</strong>消えたあとは、もう一度入力が必要です。</p>
           <ul>
             <li>ブラウザ（Chrome）を閉じたとき</li>

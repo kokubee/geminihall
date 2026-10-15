@@ -47,7 +47,7 @@ async function runCase(c: AuditCase, apiKey: string): Promise<CaseOutcome> {
     const out = await runAudit({
       requestId: crypto.randomUUID(),
       provider,
-      apiKey,
+      credential: { kind: "API_KEY", apiKey },
       model,
       input: { claim: c.claim, context: c.context, locale: "ja" },
     });

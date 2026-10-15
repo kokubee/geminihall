@@ -2,6 +2,9 @@ import type { AuditResult, AuditTrace, EvidenceSource, Provider } from "@geminih
 
 export const SESSION_KEYS = {
   apiKeys: "byok.apiKeys",
+  siwcTokens: "siwc.tokens",
+  siwcPending: "siwc.pending",
+  siwcStatus: "siwc.status",
   job: "audit.currentJob",
   pendingInput: "audit.pendingInput",
   privateCache: "audit.privateCache",
@@ -11,13 +14,53 @@ export const LOCAL_KEYS = {
   settings: "settings",
   clientToken: "clientToken",
   keyHistory: "keyHistory",
+  siwcHostId: "siwc.hostId",
+  siwcRegistration: "siwc.registration",
 } as const;
+
+export type UiProvider = Provider | "CHATGPT_PLAN";
+
+export function auditProviderOf(p: UiProvider): Provider {
+  return p === "CHATGPT_PLAN" ? "OPENAI" : p;
+}
+
+export interface SiwcRegistration {
+  clientId: string;
+  sub: string;
+  email: string | null;
+  welcomed: boolean;
+}
+
+export interface SiwcTokens {
+  clientId: string;
+  sub: string;
+  accessToken: string;
+  refreshToken: string | null;
+  expiresAt: number;
+  scopes: string[];
+}
+
+export interface SiwcPending {
+  state: string;
+  nonce: string;
+  verifier: string;
+  redirectUri: string;
+  clientId: string | null;
+  startedAt: number;
+}
+
+export type SiwcStatus =
+  | { state: "SIGNED_OUT"; message?: string }
+  | { state: "SIGNING_IN" }
+  | { state: "SIGNED_IN"; email: string | null }
+  | { state: "NO_PLAN"; email: string | null }
+  | { state: "ERROR"; message: string };
 
 export type ApiKeys = Partial<Record<Provider, string>>;
 
 export interface Settings {
-  provider: Provider;
-  models: Record<Provider, string>;
+  provider: UiProvider;
+  models: Record<UiProvider, string>;
   costNoticeAccepted: boolean;
   publicLookup: boolean;
   demoMode: boolean;
@@ -50,6 +93,7 @@ export type JobSource = "LIVE" | "PRIVATE_CACHE" | "PUBLIC" | "DEMO";
 
 export type JobErrorKind =
   | "NO_API_KEY"
+  | "NOT_SIGNED_IN"
   | "INVALID_INPUT"
   | "UPSTREAM_AI_UNAVAILABLE"
   | "INTERNAL_AUDIT_SCHEMA_VIOLATION"
@@ -89,6 +133,11 @@ export interface PendingInput {
 
 export type BackgroundMessage =
   | { type: "START_AUDIT"; claim: string; context?: string; force?: boolean }
+  | { type: "SIWC_START" }
+  | { type: "SIWC_CALLBACK"; search: string }
+  | { type: "SIWC_SIGN_OUT" }
+  | { type: "SIWC_MODELS" }
+  | { type: "SIWC_ACK_WELCOME" }
   | { type: "SUBMIT_FOR_PUBLICATION"; requestId: string }
   | { type: "REFRESH_SUBMISSION"; requestId: string }
   | { type: "PING" };

@@ -117,3 +117,8 @@ export function openaiResponse(output: ModelAuditOutput, searchUrls: string[], c
     usage: { input_tokens: 10, output_tokens: 10, total_tokens: 20 },
   };
 }
+
+export function sseResponse(events: unknown[]): Response {
+  const body = events.map((e) => `event: ${(e as { type: string }).type}\ndata: ${JSON.stringify(e)}\n\n`).join("");
+  return new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } });
+}

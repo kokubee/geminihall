@@ -9,11 +9,12 @@
     "zip": "wxt zip",
     "typecheck": "wxt prepare && tsc -p tsconfig.json",
     "test": "vitest run",
-    "e2e": "wxt build && node e2e/run.mjs"
+    "e2e": "wxt build && node e2e/run.mjs && node e2e/siwc.mjs"
   },
   "dependencies": {
     "@geminihall/audit-core": "workspace:*",
-    "@geminihall/schema": "workspace:*"
+    "@geminihall/schema": "workspace:*",
+    "jose": "~6.2.12"
   },
   "devDependencies": {
     "@types/chrome": "^0.3.5",

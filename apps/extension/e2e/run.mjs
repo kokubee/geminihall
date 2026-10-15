@@ -353,7 +353,7 @@ await check("DEMO: 記録済みの結果を DEMO 表示で返し、AIもサー�
 
 await check("キー消失の説明: 設定画面に消える場面が書かれ、消えたキーは理由付きで再入力を求める", async () => {
   await openSettings(page);
-  const notice = await page.textContent(".key-notice");
+  const notice = await page.textContent("#key-notice");
   for (const phrase of ["ブラウザ（Chrome）を閉じたとき", "更新・再読み込みしたとき", "控えておいてください"]) assert.ok(notice.includes(phrase), phrase);
   await page.fill("#api-key", FAKE_KEY);
   await page.click("#settings-form button[type=submit]");

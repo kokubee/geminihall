@@ -2,13 +2,18 @@ import { CONSENT_TEXT } from "../../lib/config";
 import { h, renderResult, viewFromEntry, viewFromResult } from "../../lib/render";
 import { KEY_LOSS_NOTE, loadApiKeys, loadSettings, maskKey, saveSettings, setApiKey, wasKeyEntered } from "../../lib/settings";
 import {
+  LOCAL_KEYS,
   SESSION_KEYS,
+  auditProviderOf,
   type AuditJob,
   type PendingInput,
   type Settings,
+  type SiwcRegistration,
+  type SiwcStatus,
   type StartAuditResponse,
+  type UiProvider,
 } from "../../lib/state";
-import type { Provider } from "@geminihall/schema";
+import type { PlanModel } from "../../lib/siwc";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -20,6 +25,16 @@ const publicLookupEl = $<HTMLInputElement>("public-lookup");
 const settingsForm = $<HTMLFormElement>("settings-form");
 const settingsPanel = $<HTMLDetailsElement>("settings");
 const clearKeyBtn = $<HTMLButtonElement>("clear-key");
+const keyFields = $<HTMLDivElement>("key-fields");
+const keyNotice = $<HTMLDivElement>("key-notice");
+const siwcSection = $<HTMLDivElement>("siwc-section");
+const siwcStatusEl = $<HTMLParagraphElement>("siwc-status");
+const siwcLoginBtn = $<HTMLButtonElement>("siwc-login");
+const siwcLogoutBtn = $<HTMLButtonElement>("siwc-logout");
+const siwcWelcome = $<HTMLDivElement>("siwc-welcome");
+const siwcWelcomeOk = $<HTMLButtonElement>("siwc-welcome-ok");
+const planModelField = $<HTMLLabelElement>("plan-model-field");
+const planModelEl = $<HTMLSelectElement>("plan-model");
 const demoEl = $<HTMLInputElement>("demo-mode");
 const modeBadge = $<HTMLSpanElement>("mode-badge");
 const claimEl = $<HTMLTextAreaElement>("claim");
@@ -35,9 +50,89 @@ let settings: Settings;
 let timer: number | undefined;
 let currentJob: AuditJob | undefined;
 
+function isPlan() {
+  return providerEl.value === "CHATGPT_PLAN";
+}
+
+function renderProviderFields() {
+  const plan = isPlan();
+  keyFields.hidden = plan;
+  keyNotice.hidden = plan;
+  clearKeyBtn.hidden = plan;
+  siwcSection.hidden = !plan;
+  if (plan) void refreshSiwc();
+}
+
+async function refreshSiwc() {
+  const status = (await chrome.storage.session.get(SESSION_KEYS.siwcStatus))[SESSION_KEYS.siwcStatus] as SiwcStatus | undefined;
+  const tokens = (await chrome.storage.session.get(SESSION_KEYS.siwcTokens))[SESSION_KEYS.siwcTokens];
+  const reg = (await chrome.storage.local.get(LOCAL_KEYS.siwcRegistration))[LOCAL_KEYS.siwcRegistration] as SiwcRegistration | undefined;
+  const signedIn = Boolean(tokens) && status?.state !== "SIGNED_OUT";
+  siwcLoginBtn.hidden = signedIn && status?.state !== "NO_PLAN";
+  siwcLogoutBtn.hidden = !signedIn;
+  siwcLoginBtn.disabled = status?.state === "SIGNING_IN";
+  planModelField.hidden = !(signedIn && status?.state !== "NO_PLAN");
+  siwcWelcome.hidden = !(signedIn && reg && !reg.welcomed && status?.state === "SIGNED_IN");
+  const who = reg?.email ?? "ChatGPT アカウント";
+  siwcStatusEl.textContent =
+    status?.state === "SIGNING_IN"
+      ? "別のタブで ChatGPT にログインしてください…"
+      : status?.state === "ERROR"
+        ? status.message
+        : status?.state === "NO_PLAN"
+          ? `${who} でログインしましたが、ChatGPT プランの利用が許可されていません。「Continue with ChatGPT」から許可してください。`
+          : signedIn
+            ? `ログイン中: ${who}（ブラウザを閉じるか拡張機能を更新するまで有効）`
+            : status?.state === "SIGNED_OUT" && status.message
+              ? status.message
+              : reg
+                ? `前回は ${who} でログインしていました。もう一度ログインしてください。`
+                : "まだログインしていません。";
+  if (!planModelField.hidden && planModelEl.options.length === 0) await loadPlanModels();
+}
+
+async function loadPlanModels() {
+  const models = ((await chrome.runtime.sendMessage({ type: "SIWC_MODELS" }).catch(() => [])) ?? []) as PlanModel[];
+  planModelEl.replaceChildren(...models.map((m) => new Option(m.displayName, m.slug)));
+  if (!models.length) {
+    planModelEl.append(new Option("（モデル一覧を取得できませんでした）", ""));
+    return;
+  }
+  const saved = settings.models.CHATGPT_PLAN;
+  planModelEl.value = models.some((m) => m.slug === saved) ? saved : models[0]!.slug;
+  if (planModelEl.value !== saved) {
+    settings = { ...settings, models: { ...settings.models, CHATGPT_PLAN: planModelEl.value } };
+    await saveSettings(settings);
+  }
+}
+
+planModelEl.addEventListener("change", async () => {
+  settings = { ...settings, models: { ...settings.models, CHATGPT_PLAN: planModelEl.value } };
+  await saveSettings(settings);
+});
+
+siwcLoginBtn.addEventListener("click", async () => {
+  settings = { ...settings, provider: "CHATGPT_PLAN" };
+  await saveSettings(settings);
+  await chrome.runtime.sendMessage({ type: "SIWC_START" }).catch(() => undefined);
+});
+
+siwcLogoutBtn.addEventListener("click", async () => {
+  siwcLogoutBtn.disabled = true;
+  await chrome.runtime.sendMessage({ type: "SIWC_SIGN_OUT" }).catch(() => undefined);
+  siwcLogoutBtn.disabled = false;
+  planModelEl.replaceChildren();
+});
+
+siwcWelcomeOk.addEventListener("click", async () => {
+  await chrome.runtime.sendMessage({ type: "SIWC_ACK_WELCOME" }).catch(() => undefined);
+  siwcWelcome.hidden = true;
+});
+
 async function refreshKeyStatus() {
+  if (isPlan()) return;
   const keys = await loadApiKeys();
-  const provider = providerEl.value as Provider;
+  const provider = auditProviderOf(providerEl.value as UiProvider);
   const key = keys[provider];
   keyStatusEl.textContent = key
     ? `入力済み: ${maskKey(key)}（ブラウザを閉じるか拡張機能を更新するまで有効）`
@@ -60,20 +155,24 @@ function renderMode() {
 function fillSettingsForm() {
   providerEl.value = settings.provider;
   modelEl.value = settings.models[settings.provider];
+  renderProviderFields();
   publicLookupEl.checked = settings.publicLookup;
   renderMode();
 }
 
-providerEl.addEventListener("change", () => {
-  const p = providerEl.value as Provider;
+providerEl.addEventListener("change", async () => {
+  const p = providerEl.value as UiProvider;
   modelEl.value = settings.models[p];
+  settings = { ...settings, provider: p };
+  await saveSettings(settings);
+  renderProviderFields();
   void refreshKeyStatus();
 });
 
 settingsForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const p = providerEl.value as Provider;
-  const model = modelEl.value.trim();
+  const p = providerEl.value as UiProvider;
+  const model = isPlan() ? settings.models.CHATGPT_PLAN : modelEl.value.trim();
   settings = {
     ...settings,
     provider: p,
@@ -83,13 +182,14 @@ settingsForm.addEventListener("submit", async (e) => {
   };
   await saveSettings(settings);
   const key = keyEl.value.trim();
-  if (key) await setApiKey(p, key);
+  if (key && p !== "CHATGPT_PLAN") await setApiKey(p, key);
   await refreshKeyStatus();
   keyStatusEl.textContent += "（設定を保存しました）";
 });
 
 clearKeyBtn.addEventListener("click", async () => {
-  await setApiKey(providerEl.value as Provider, null);
+  if (isPlan()) return;
+  await setApiKey(providerEl.value as "ANTHROPIC" | "OPENAI", null);
   await refreshKeyStatus();
 });
 
@@ -196,7 +296,7 @@ async function start(force: boolean) {
     inputErrorEl.hidden = false;
     return;
   }
-  if (!settings.demoMode && !settings.costNoticeAccepted) {
+  if (!settings.demoMode && !isPlan() && !settings.costNoticeAccepted) {
     const ok = window.confirm("監査はあなたのAPIキーで実行され、利用料はあなたのアカウントに請求されます。続けますか？");
     if (!ok) return;
     settings = { ...settings, costNoticeAccepted: true };
@@ -239,6 +339,7 @@ async function applyPendingInput() {
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "session") return;
+  if ((changes[SESSION_KEYS.siwcStatus] || changes[SESSION_KEYS.siwcTokens]) && isPlan()) void refreshSiwc();
   const jobChange = changes[SESSION_KEYS.job];
   if (jobChange) renderJob(jobChange.newValue as AuditJob | undefined);
   if (changes[SESSION_KEYS.pendingInput]?.newValue) void applyPendingInput();

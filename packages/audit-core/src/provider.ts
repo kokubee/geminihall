@@ -2,8 +2,12 @@ import { ModelAuditOutputSchema, type ModelAuditOutput } from "@geminihall/schem
 import { z } from "zod";
 import { ModelOutputError } from "./errors";
 
+export type Credential =
+  | { kind: "API_KEY"; apiKey: string }
+  | { kind: "CHATGPT_PLAN"; accessToken: string };
+
 export interface ProviderRequest {
-  apiKey: string;
+  credential: Credential;
   model: string;
   system: string;
   user: string;

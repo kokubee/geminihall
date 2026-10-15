@@ -6,7 +6,7 @@ import { normalizeUrl } from "./normalize";
 import { cacheIdentity } from "./identity";
 import { openaiAdapter } from "./openai";
 import { AUDIT_SYSTEM_PROMPT, buildUserMessage } from "./prompt";
-import type { ProviderAdapter } from "./provider";
+import type { Credential, ProviderAdapter } from "./provider";
 
 export { AUDIT_POLICY_VERSION, cacheIdentity, type CacheIdentity } from "./identity";
 export { DEFAULT_MODELS } from "./models";
@@ -19,7 +19,7 @@ const ADAPTERS: Record<Provider, ProviderAdapter> = {
 export interface RunAuditArgs {
   requestId: string;
   provider: Provider;
-  apiKey: string;
+  credential: Credential;
   model: string;
   input: AuditInput;
   signal?: AbortSignal;
@@ -39,7 +39,7 @@ export async function runAudit(args: RunAuditArgs): Promise<RunAuditResult> {
   const adapter = ADAPTERS[args.provider];
 
   const providerResult = await adapter.run({
-    apiKey: args.apiKey,
+    credential: args.credential,
     model: args.model,
     system: AUDIT_SYSTEM_PROMPT,
     user: buildUserMessage(args.input),
@@ -58,7 +58,7 @@ export async function runAudit(args: RunAuditArgs): Promise<RunAuditResult> {
   const assembled = assembleResult({
     requestId: args.requestId,
     mode: "LIVE",
-    auditor: { provider: args.provider, model: args.model },
+    auditor: { provider: args.provider, model: args.model, via: args.credential.kind },
     normalizedClaim: identity.normalizedClaim,
     contextFingerprint: identity.contextFingerprint,
     model: providerResult.output,

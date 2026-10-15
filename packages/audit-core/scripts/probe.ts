@@ -17,7 +17,7 @@ try {
   const out = await runAudit({
     requestId: crypto.randomUUID(),
     provider,
-    apiKey,
+    credential: { kind: "API_KEY", apiKey },
     model,
     input: { claim, locale: "ja" },
   });

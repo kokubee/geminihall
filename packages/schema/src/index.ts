@@ -36,9 +36,12 @@ export const ModeEnum = z.enum(["LIVE", "DEMO"]);
 
 export const ProviderEnum = z.enum(["ANTHROPIC", "OPENAI"]);
 
+export const AuthViaEnum = z.enum(["API_KEY", "CHATGPT_PLAN", "MCP"]);
+
 export const AuditorSchema = z.object({
   provider: ProviderEnum,
   model: z.string().min(1),
+  via: AuthViaEnum.optional(),
 });
 
 export const HttpUrlSchema = z.url({ protocol: /^https?$/ });

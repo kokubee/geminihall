@@ -22,7 +22,7 @@ describe("runAudit with Anthropic", () => {
     const out = await runAudit({
       requestId: REQUEST_ID,
       provider: "ANTHROPIC",
-      apiKey: FAKE_KEY,
+      credential: { kind: "API_KEY", apiKey: FAKE_KEY },
       model: "claude-opus-5-5",
       input,
       now: fixedNow,
@@ -31,7 +31,7 @@ describe("runAudit with Anthropic", () => {
     expect(out.downgraded).toBe(false);
     expect(out.result.audit_status).toBe("CONFIRMED_HALLUCINATION");
     expect(out.result.evidence_sources[0]?.verified).toBe(true);
-    expect(out.result.auditor).toEqual({ provider: "ANTHROPIC", model: "claude-opus-5-5" });
+    expect(out.result.auditor).toEqual({ provider: "ANTHROPIC", model: "claude-opus-5-5", via: "API_KEY" });
     expect(out.result.expires_at).toBe("2026-11-14T00:00:00.000Z");
     expect(AuditResultSchema.safeParse(out.result).success).toBe(true);
 
@@ -47,7 +47,7 @@ describe("runAudit with Anthropic", () => {
     const out = await runAudit({
       requestId: REQUEST_ID,
       provider: "ANTHROPIC",
-      apiKey: FAKE_KEY,
+      credential: { kind: "API_KEY", apiKey: FAKE_KEY },
       model: "claude-opus-5-5",
       input,
       now: fixedNow,
@@ -66,7 +66,7 @@ describe("runAudit with Anthropic", () => {
     const out = await runAudit({
       requestId: REQUEST_ID,
       provider: "ANTHROPIC",
-      apiKey: FAKE_KEY,
+      credential: { kind: "API_KEY", apiKey: FAKE_KEY },
       model: "claude-opus-5-5",
       input,
       now: fixedNow,
@@ -82,7 +82,7 @@ describe("runAudit with Anthropic", () => {
     const out = await runAudit({
       requestId: REQUEST_ID,
       provider: "ANTHROPIC",
-      apiKey: FAKE_KEY,
+      credential: { kind: "API_KEY", apiKey: FAKE_KEY },
       model: "claude-opus-5-5",
       input,
       now: fixedNow,
@@ -97,7 +97,7 @@ describe("runAudit with Anthropic", () => {
       runAudit({
         requestId: REQUEST_ID,
         provider: "ANTHROPIC",
-        apiKey: FAKE_KEY,
+        credential: { kind: "API_KEY", apiKey: FAKE_KEY },
         model: "claude-opus-5-5",
         input,
         fetch: mockFetch([anthropicMessage(confirmedOutput([SOURCE]), [SOURCE], "refusal")]),
@@ -109,7 +109,7 @@ describe("runAudit with Anthropic", () => {
     const err = await runAudit({
       requestId: REQUEST_ID,
       provider: "ANTHROPIC",
-      apiKey: FAKE_KEY,
+      credential: { kind: "API_KEY", apiKey: FAKE_KEY },
       model: "claude-opus-5-5",
       input,
       fetch: mockFetch([
@@ -131,7 +131,7 @@ describe("runAudit with Anthropic", () => {
       runAudit({
         requestId: REQUEST_ID,
         provider: "ANTHROPIC",
-        apiKey: FAKE_KEY,
+        credential: { kind: "API_KEY", apiKey: FAKE_KEY },
         model: "claude-opus-5-5",
         input,
         fetch: mockFetch([msg]),
@@ -145,7 +145,7 @@ describe("runAudit with Anthropic", () => {
       runAudit({
         requestId: REQUEST_ID,
         provider: "ANTHROPIC",
-        apiKey: FAKE_KEY,
+        credential: { kind: "API_KEY", apiKey: FAKE_KEY },
         model: "claude-opus-5-5",
         input,
         fetch: mockFetch([anthropicMessage(output, [SOURCE])]),
@@ -160,7 +160,7 @@ describe("runAudit with OpenAI", () => {
     const out = await runAudit({
       requestId: REQUEST_ID,
       provider: "OPENAI",
-      apiKey: FAKE_KEY,
+      credential: { kind: "API_KEY", apiKey: FAKE_KEY },
       model: "gpt-6-astra",
       input,
       now: fixedNow,
@@ -182,7 +182,7 @@ describe("runAudit with OpenAI", () => {
     const out = await runAudit({
       requestId: REQUEST_ID,
       provider: "OPENAI",
-      apiKey: FAKE_KEY,
+      credential: { kind: "API_KEY", apiKey: FAKE_KEY },
       model: "gpt-6-astra",
       input,
       now: fixedNow,
@@ -195,7 +195,7 @@ describe("runAudit with OpenAI", () => {
     const out = await runAudit({
       requestId: REQUEST_ID,
       provider: "OPENAI",
-      apiKey: FAKE_KEY,
+      credential: { kind: "API_KEY", apiKey: FAKE_KEY },
       model: "gpt-6-astra",
       input,
       now: fixedNow,
@@ -249,7 +249,7 @@ describe("OpenAI inline citations", () => {
     const out = await runAudit({
       requestId: REQUEST_ID,
       provider: "OPENAI",
-      apiKey: FAKE_KEY,
+      credential: { kind: "API_KEY", apiKey: FAKE_KEY },
       model: "gpt-6-astra",
       input,
       now: fixedNow,

@@ -1,12 +1,14 @@
-import { InvalidClaimError, ModelOutputError, SchemaViolationError, UpstreamError, runAudit } from "@geminihall/audit-core";
+import { InvalidClaimError, ModelOutputError, SchemaViolationError, UpstreamError, runAudit, type Credential } from "@geminihall/audit-core";
 import { cacheIdentity } from "@geminihall/audit-core/identity";
 import { AuditInputSchema } from "@geminihall/schema";
 import { lookupPublic, submissionStatus, submitForPublication } from "../lib/api";
 import { getPrivate, putPrivate } from "../lib/cache";
 import { DEMO_CLAIM, demoResult } from "../lib/demo";
 import { KEY_LOSS_NOTE, loadApiKeys, loadSettings, wasKeyEntered } from "../lib/settings";
+import { acknowledgeWelcome, accessToken, completeSignIn, invalidateSession, planModels, signOut, startSignIn } from "../lib/siwc-session";
 import {
   SESSION_KEYS,
+  auditProviderOf,
   type AuditJob,
   type BackgroundMessage,
   type JobErrorKind,
@@ -48,7 +50,22 @@ async function markOrphanedJobInterrupted() {
   }
 }
 
+const PLAN_ERROR_MESSAGES: Record<string, string> = {
+  subscription_sharing_usage_limit_exceeded:
+    "ChatGPT プランの利用上限に達しました。ChatGPT の設定の「使用状況」で、プラン全体またはこのアプリの上限を確認してください。",
+  subscription_sharing_user_not_eligible: "このアカウントやワークスペースでは、ChatGPT プランを外部アプリで使えません。",
+  subscription_sharing_usage_unavailable: "ChatGPT プランの利用状況を確認できませんでした。時間をおいて再実行してください。",
+  subscription_sharing_user_unavailable: "ChatGPT のアカウント情報を一時的に確認できませんでした。時間をおいて再実行してください。",
+  subscription_sharing_unsupported_capability:
+    "この監査で使う機能（web 検索や出力形式の指定など）が、ChatGPT プラン経由では使えませんでした。",
+  subscription_sharing_route_not_supported: "ChatGPT プラン経由では、この呼び出し方が許可されていませんでした。",
+  subscription_sharing_invalid_user: "ChatGPT のログイン情報を確認できませんでした。もう一度ログインしてください。",
+};
+
 function classify(err: unknown): { kind: JobErrorKind; message: string; status?: number } {
+  if (err instanceof UpstreamError && err.code && PLAN_ERROR_MESSAGES[err.code]) {
+    return { kind: "UPSTREAM_AI_UNAVAILABLE", status: err.status, message: PLAN_ERROR_MESSAGES[err.code]! };
+  }
   if (err instanceof InvalidClaimError) {
     return { kind: "INVALID_INPUT", message: "検証できる事実の主張が見つかりませんでした。" };
   }
@@ -78,8 +95,9 @@ async function startAudit(claim: string, context: string | undefined, force: boo
     return { ok: false, reason: "ALREADY_RUNNING" };
   }
 
-  const provider = settings.provider;
-  const model = settings.models[provider];
+  const uiProvider = settings.provider;
+  const provider = auditProviderOf(uiProvider);
+  const model = settings.models[uiProvider] || (uiProvider === "CHATGPT_PLAN" ? "gpt-6-astra" : "");
   const requestId = crypto.randomUUID();
   const startedAt = new Date().toISOString();
 
@@ -122,18 +140,30 @@ async function startAudit(claim: string, context: string | undefined, force: boo
     }
   }
 
-  const apiKey = (await loadApiKeys())[provider];
+  const usePlan = uiProvider === "CHATGPT_PLAN";
+  const apiKey = usePlan ? undefined : (await loadApiKeys())[provider];
+  const planToken = usePlan ? await accessToken() : null;
+  const credential: Credential | null = usePlan
+    ? planToken
+      ? { kind: "CHATGPT_PLAN", accessToken: planToken }
+      : null
+    : apiKey
+      ? { kind: "API_KEY", apiKey }
+      : null;
   const needsLookup = !force && settings.publicLookup;
-  const missingKeyMessage = (await wasKeyEntered(provider))
-    ? KEY_LOSS_NOTE
-    : "APIキーが設定されていません。設定画面で入力してください。";
+  const missingKeyMessage = usePlan
+    ? "ChatGPT にログインしていません。設定画面の「Continue with ChatGPT」からログインしてください（試作機能）。"
+    : (await wasKeyEntered(provider))
+      ? KEY_LOSS_NOTE
+      : "APIキーが設定されていません。設定画面で入力してください。";
+  const missingKind: JobErrorKind = usePlan ? "NOT_SIGNED_IN" : "NO_API_KEY";
 
-  if (!apiKey && !needsLookup) {
+  if (!credential && !needsLookup) {
     await writeJob({
       ...base,
       state: "FAILED",
       finishedAt: startedAt,
-      error: { kind: "NO_API_KEY", message: missingKeyMessage },
+      error: { kind: missingKind, message: missingKeyMessage },
     });
     return { ok: true, requestId };
   }
@@ -151,16 +181,19 @@ async function startAudit(claim: string, context: string | undefined, force: boo
           return;
         }
       }
-      if (!apiKey) {
+      if (!credential) {
         await writeJob({
           ...base,
           state: "FAILED",
           finishedAt: new Date().toISOString(),
-          error: { kind: "NO_API_KEY", message: `公開辞典に同じ事例はありませんでした。監査するには APIキーが必要です。${missingKeyMessage}` },
+          error: {
+            kind: missingKind,
+            message: `公開辞典に同じ事例はありませんでした。${usePlan ? "" : "監査するには APIキーが必要です。"}${missingKeyMessage}`,
+          },
         });
         return;
       }
-      const out = await runAudit({ requestId, provider, apiKey, model, input });
+      const out = await runAudit({ requestId, provider, credential, model, input });
       await putPrivate(
         identity.claimCacheKey,
         { result: out.result, claim: input.claim, context: input.context, savedAt: new Date().toISOString() },
@@ -174,6 +207,9 @@ async function startAudit(claim: string, context: string | undefined, force: boo
         downgraded: out.downgraded,
       });
     } catch (err) {
+      if (usePlan && err instanceof UpstreamError && (err.status === 401 || err.code === "subscription_sharing_invalid_user")) {
+        await invalidateSession("ChatGPT のログインが無効になりました。もう一度ログインしてください。");
+      }
       await writeJob({ ...base, state: "FAILED", finishedAt: new Date().toISOString(), error: classify(err) });
     } finally {
       clearInterval(keepalive);
@@ -258,6 +294,21 @@ export default defineBackground(() => {
         return true;
       case "REFRESH_SUBMISSION":
         void refreshSubmission(message.requestId).then(() => sendResponse({ ok: true }));
+        return true;
+      case "SIWC_START":
+        void startSignIn().then(() => sendResponse({ ok: true }), () => sendResponse({ ok: false }));
+        return true;
+      case "SIWC_CALLBACK":
+        void completeSignIn(message.search).then(sendResponse);
+        return true;
+      case "SIWC_SIGN_OUT":
+        void signOut().then(sendResponse);
+        return true;
+      case "SIWC_MODELS":
+        void planModels().then(sendResponse);
+        return true;
+      case "SIWC_ACK_WELCOME":
+        void acknowledgeWelcome().then(() => sendResponse({ ok: true }));
         return true;
       case "PING":
         sendResponse({ ok: true });

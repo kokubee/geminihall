@@ -30,8 +30,9 @@ export function anthropicRetrievedUrls(content: Anthropic.Beta.BetaContentBlock[
 
 export const anthropicAdapter: ProviderAdapter = {
   async run(req: ProviderRequest): Promise<ProviderResult> {
+    if (req.credential.kind !== "API_KEY") throw new UpstreamError("Claude requires an API key");
     const client = new Anthropic({
-      apiKey: req.apiKey,
+      apiKey: req.credential.apiKey,
       dangerouslyAllowBrowser: true,
       timeout: AUDIT_TIMEOUT_MS,
       maxRetries: 0,

@@ -54,6 +54,9 @@ importers:
       '@geminihall/schema':
         specifier: workspace:*
         version: link:../../packages/schema
+      jose:
+        specifier: ~6.2.12
+        version: 6.2.12
     devDependencies:
       '@types/chrome':
         specifier: ^0.3.5

@@ -152,3 +152,8 @@ blockquote { margin: 4px 0 0; padding-left: 8px; border-left: 3px solid var(--bo
 .key-notice p { margin: 4px 0; }
 .key-notice ul { margin: 4px 0; padding-left: 18px; }
 .key-lost { color: var(--unverified-fg); background: var(--unverified-bg); border-radius: 6px; padding: 6px 8px; font-weight: 600; }
+
+button.chatgpt { background: #0d0d0d; color: #ffffff; border-color: #0d0d0d; font-weight: 600; }
+@media (prefers-color-scheme: dark) { button.chatgpt { background: #ffffff; color: #0d0d0d; border-color: #ffffff; } }
+.welcome { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin: 6px 0; font-size: 13px; background: var(--surface); }
+.welcome p { margin: 4px 0; }
