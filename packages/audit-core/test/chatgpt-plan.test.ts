@@ -31,6 +31,7 @@ describe("runAudit with a ChatGPT plan token", () => {
     expect(out.result.auditor.via).toBe("CHATGPT_PLAN");
     const body = captured[0]!.body as Record<string, unknown>;
     expect(body.stream).toBe(true);
+    expect(body.input).toEqual([{ type: "message", role: "user", content: [{ type: "input_text", text: expect.stringContaining("1950") }] }]);
     expect(body.store).toBe(false);
     expect(body).not.toHaveProperty("max_output_tokens");
     expect(body).not.toHaveProperty("temperature");

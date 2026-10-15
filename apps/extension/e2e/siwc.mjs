@@ -223,6 +223,7 @@ await check("監査: サブスクのトークンで stream=true・store=false �
   assert.equal(r.headers.authorization, `Bearer ${ACCESS}`);
   assert.equal(r.body.stream, true);
   assert.equal(r.body.store, false);
+  assert.ok(Array.isArray(r.body.input), "plan route requires input as a list");
   assert.equal(r.body.model, "gpt-plan-e2e");
   const job = await sw.evaluate(async () => (await chrome.storage.session.get("audit.currentJob"))["audit.currentJob"]);
   assert.equal(job.result.auditor.via, "CHATGPT_PLAN");

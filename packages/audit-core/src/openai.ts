@@ -108,7 +108,7 @@ export const openaiAdapter: ProviderAdapter = {
     const params: OpenAI.Responses.ResponseCreateParamsNonStreaming = {
       model: req.model,
       instructions: req.system,
-      input: req.user,
+      input: [{ type: "message", role: "user", content: [{ type: "input_text", text: req.user }] }],
       tools: [{ type: "web_search" }],
       include: ["web_search_call.action.sources"],
       store: false,
