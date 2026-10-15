@@ -10,6 +10,7 @@ export const SESSION_KEYS = {
 export const LOCAL_KEYS = {
   settings: "settings",
   clientToken: "clientToken",
+  keyHistory: "keyHistory",
 } as const;
 
 export type ApiKeys = Partial<Record<Provider, string>>;

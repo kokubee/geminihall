@@ -151,7 +151,7 @@ await check("設定: 偽キーを保存でき、パネルには伏せ字だけ�
   await page.selectOption("#provider", "ANTHROPIC");
   await page.fill("#api-key", FAKE_KEY);
   await page.click("#settings-form button[type=submit]");
-  await page.waitForFunction(() => document.querySelector("#key-status")?.textContent?.includes("保存済み"));
+  await page.waitForFunction(() => document.querySelector("#key-status")?.textContent?.includes("入力済み"));
   const status = await page.textContent("#key-status");
   assert.ok(!status.includes(FAKE_KEY));
   assert.equal(await page.inputValue("#api-key"), "");
@@ -229,7 +229,7 @@ await check("キー未設定: キーを消して実行すると、設定を促�
   await page.fill("#claim", "日本国憲法は1952年に施行された");
   await page.click("#run");
   await page.waitForSelector("#status .error", { timeout: 5000 });
-  assert.ok((await page.textContent("#status .error")).includes("APIキーを入力"));
+  assert.ok((await page.textContent("#status .error")).includes("APIキーが設定されていません"));
   assert.equal(outbound.length, before);
 });
 
@@ -237,7 +237,7 @@ await check("HTTP 401: キーが拒否されたら設定確認を促す", async 
   await openSettings(page);
   await page.fill("#api-key", FAKE_KEY);
   await page.click("#settings-form button[type=submit]");
-  await page.waitForFunction(() => document.querySelector("#key-status")?.textContent?.includes("保存済み"));
+  await page.waitForFunction(() => document.querySelector("#key-status")?.textContent?.includes("入力済み"));
   aiStatus = 401;
   await page.fill("#claim", "日本国憲法は1953年に施行された");
   await page.click("#run");
@@ -349,6 +349,25 @@ await check("DEMO: 記録済みの結果を DEMO 表示で返し、AIもサー�
   assert.ok(await page.isHidden("#submission"));
   await page.screenshot({ path: path.resolve(here, "../.output/e2e-demo.png"), fullPage: true });
   await page.uncheck("#demo-mode");
+});
+
+await check("キー消失の説明: 設定画面に消える場面が書かれ、消えたキーは理由付きで再入力を求める", async () => {
+  await openSettings(page);
+  const notice = await page.textContent(".key-notice");
+  for (const phrase of ["ブラウザ（Chrome）を閉じたとき", "更新・再読み込みしたとき", "控えておいてください"]) assert.ok(notice.includes(phrase), phrase);
+  await page.fill("#api-key", FAKE_KEY);
+  await page.click("#settings-form button[type=submit]");
+  await page.waitForFunction(() => document.querySelector("#key-status")?.textContent?.includes("入力済み"));
+  await sw.evaluate(() => chrome.storage.session.remove("byok.apiKeys"));
+  await page.close();
+  page = await openPanel();
+  await page.waitForFunction(() => document.querySelector("#key-status")?.textContent?.includes("以前に入力したキーは消えています"));
+  const local = await sw.evaluate(async () => JSON.stringify(await chrome.storage.local.get(null)));
+  assert.ok(!local.includes(FAKE_KEY), "key must not be in storage.local");
+  await page.fill("#claim", "キーが消えたあとの主張");
+  await page.click("#run");
+  await page.waitForSelector("#status .error", { timeout: 10000 });
+  assert.ok((await page.textContent("#status .error")).includes("以前に入力したキーは消えています"));
 });
 
 await check("通信先: 拡張が通信したのは各社APIと geminihall.cc だけで、サーバーへの通信にキーが含まれない", async () => {

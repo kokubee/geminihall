@@ -4,7 +4,7 @@ import { AuditInputSchema } from "@geminihall/schema";
 import { lookupPublic, submissionStatus, submitForPublication } from "../lib/api";
 import { getPrivate, putPrivate } from "../lib/cache";
 import { DEMO_CLAIM, demoResult } from "../lib/demo";
-import { loadApiKeys, loadSettings } from "../lib/settings";
+import { KEY_LOSS_NOTE, loadApiKeys, loadSettings, wasKeyEntered } from "../lib/settings";
 import {
   SESSION_KEYS,
   type AuditJob,
@@ -124,13 +124,16 @@ async function startAudit(claim: string, context: string | undefined, force: boo
 
   const apiKey = (await loadApiKeys())[provider];
   const needsLookup = !force && settings.publicLookup;
+  const missingKeyMessage = (await wasKeyEntered(provider))
+    ? KEY_LOSS_NOTE
+    : "APIキーが設定されていません。設定画面で入力してください。";
 
   if (!apiKey && !needsLookup) {
     await writeJob({
       ...base,
       state: "FAILED",
       finishedAt: startedAt,
-      error: { kind: "NO_API_KEY", message: "APIキーが設定されていません。設定画面で入力してください。" },
+      error: { kind: "NO_API_KEY", message: missingKeyMessage },
     });
     return { ok: true, requestId };
   }
@@ -153,7 +156,7 @@ async function startAudit(claim: string, context: string | undefined, force: boo
           ...base,
           state: "FAILED",
           finishedAt: new Date().toISOString(),
-          error: { kind: "NO_API_KEY", message: "公開辞典に同じ事例はありませんでした。監査するには、設定画面でAPIキーを入力してください。" },
+          error: { kind: "NO_API_KEY", message: `公開辞典に同じ事例はありませんでした。監査するには APIキーが必要です。${missingKeyMessage}` },
         });
         return;
       }

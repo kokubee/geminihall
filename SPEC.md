@@ -50,6 +50,7 @@
 
 * **対応する AI**: Claude（Anthropic Messages API、web search サーバーツール）と OpenAI（Responses API、`web_search` ツール）。利用者は設定画面で AI の種類・キー・モデル名を選ぶ。
 * **キーの隔離**: キーは `chrome.storage.session` にだけ保存し、`setAccessLevel` で `TRUSTED_CONTEXTS` に限定する。Content Script、GeminiHall のサーバー、ログには一切渡さない。ブラウザを再起動するとキーは消えるため、再入力が必要になる（キーをディスクに残さないための仕様）。
+* **キーが消える場面の明示**: キーは「ブラウザを閉じたとき」「拡張機能を更新・再読み込みしたとき」「利用者が消したとき」に消える。設定画面にこの3つと、キーを別の場所に控えておく必要があることを常に表示する。一度入力したキーが消えている場合は、「未設定」ではなく、消えた理由を添えて再入力を求める。そのために、キーを入力したことがあるかどうかの印（真偽値のみ、キーの値は含まない）を `chrome.storage.local` に記録する。
 * **直接接続**: Background Service Worker から各社 API へ直接接続する。Anthropic にはブラウザからの直接接続を示すヘッダー（SDK の `dangerouslyAllowBrowser`）を付ける。拡張の `host_permissions` は `https://api.anthropic.com/*` と `https://api.openai.com/*` と GeminiHall のサーバーに限る。
 * **接続できない場合**: サーバー経由に切り替えない。設定画面に接続失敗を表示し、監査を実行しない。
 * **費用の表示**: 監査は利用者の API 利用料で実行されることを、設定画面と初回実行時に明示する。
@@ -211,4 +212,5 @@ JSON スキーマの構造検証とは独立して、「監査結果が事実お
   * 公開申請の識別子（`submission_id`）には監査結果の `request_id` を使い、同じ申請の再送を冪等にした。
   * 意見・価値判断・予測は入力エラーにせず判定保留とする方針を第8章に定めた（監査の指示文と `AUDIT_POLICY_VERSION` を `2026-10-15.3` に更新）。
   * 将来の接続方式（Sign in with ChatGPT、MCP での提供）を第9章に追加した。
+  * キーが消える場面を設定画面に明示し、消えたキーは理由を添えて再入力を求める仕様を第4章①に追加した（実際に、拡張機能の更新でキーが消えて監査が止まった）。
   * `UNVERIFIED_OR_AMBIGUOUS` の申請を承認する場合、管理者が訂正文を入力しても公開エントリの `correction` は `null` にする（不変条件3を公開側にも適用するため）。

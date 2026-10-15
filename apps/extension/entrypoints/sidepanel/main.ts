@@ -1,6 +1,6 @@
 import { CONSENT_TEXT } from "../../lib/config";
 import { h, renderResult, viewFromEntry, viewFromResult } from "../../lib/render";
-import { loadApiKeys, loadSettings, maskKey, saveSettings, setApiKey } from "../../lib/settings";
+import { KEY_LOSS_NOTE, loadApiKeys, loadSettings, maskKey, saveSettings, setApiKey, wasKeyEntered } from "../../lib/settings";
 import {
   SESSION_KEYS,
   type AuditJob,
@@ -39,7 +39,12 @@ async function refreshKeyStatus() {
   const keys = await loadApiKeys();
   const provider = providerEl.value as Provider;
   const key = keys[provider];
-  keyStatusEl.textContent = key ? `保存済み: ${maskKey(key)}` : "このAIのキーは未設定です。";
+  keyStatusEl.textContent = key
+    ? `入力済み: ${maskKey(key)}（ブラウザを閉じるか拡張機能を更新するまで有効）`
+    : (await wasKeyEntered(provider))
+      ? KEY_LOSS_NOTE
+      : "このAIのキーは未設定です。";
+  keyStatusEl.classList.toggle("key-lost", !key && (await wasKeyEntered(provider)));
   keyEl.value = "";
   keyEl.placeholder = key ? "変更する場合だけ入力" : "未設定";
   if (!key && !settings.demoMode) settingsPanel.open = true;

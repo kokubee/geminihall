@@ -35,9 +35,16 @@
           <input id="public-lookup" type="checkbox" />
           <span>AIを呼ぶ前に、公開辞典に同じ事例がないか照会する（送るのは主張のハッシュ値だけです）</span>
         </label>
-        <p class="hint">
-          キーはこのブラウザのセッション内だけに保存し、GeminiHall のサーバーへは送りません。ブラウザを閉じると消えるため、再起動後はもう一度入力してください。監査の利用料は、あなたのアカウントに請求されます。
-        </p>
+        <div class="key-notice">
+          <p><strong>キーは次のときに消えます。</strong>消えたあとは、もう一度入力が必要です。</p>
+          <ul>
+            <li>ブラウザ（Chrome）を閉じたとき</li>
+            <li>この拡張機能を更新・再読み込みしたとき</li>
+            <li>「このAIのキーを消す」を押したとき</li>
+          </ul>
+          <p>キーはパソコンのディスクにも GeminiHall のサーバーにも保存しないため、消えたキーは復元できません。入力する前に、パスワード管理アプリなどにキーを控えておいてください。</p>
+          <p>監査の利用料は、あなたのアカウントに請求されます。</p>
+        </div>
         <div class="row">
           <button type="submit" class="primary">保存</button>
           <button type="button" id="clear-key">このAIのキーを消す</button>

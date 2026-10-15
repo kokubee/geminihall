@@ -147,3 +147,8 @@ blockquote { margin: 4px 0 0; padding-left: 8px; border-left: 3px solid var(--bo
 .notice-info { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
 .notice-demo { font-weight: 600; }
 .entry-title { font-size: 15px; margin: 0 0 8px; }
+
+.key-notice { font-size: 12px; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin: 6px 0 10px; }
+.key-notice p { margin: 4px 0; }
+.key-notice ul { margin: 4px 0; padding-left: 18px; }
+.key-lost { color: var(--unverified-fg); background: var(--unverified-bg); border-radius: 6px; padding: 6px 8px; font-weight: 600; }
