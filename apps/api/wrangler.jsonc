@@ -16,7 +16,7 @@
     {
       "binding": "DB",
       "database_name": "geminihall",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "a303f187-338a-4501-b87f-492b534a8e27",
       "migrations_dir": "migrations"
     }
   ],
