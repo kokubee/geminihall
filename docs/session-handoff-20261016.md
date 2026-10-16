@@ -1,18 +1,23 @@
 # セッション引き継ぎ（2026-10-16）
 
-- 記録時点: 2026-10-16 20:17 JST
+- 記録時点: 2026-10-17 01:25 JST（10/16 の作業セッション分）
 - ホスト / パス: MBA-M4 / `/Users/kokubee/code2026/geminihall`
-- ブランチ / HEAD: `main`（本日のコード修正 `92a1124` + 本ドキュメントのコミットを push 済み）
+- ブランチ / HEAD: `main`（本ドキュメントのコミットまで origin/nas push 済み）
 - 正本: `SPEC.md`（v2、第9章に将来の接続方式と ChatGPT ログイン試作の経緯）、`CLAUDE.md`（Phase 構成と規約）
 
 ## このセッションで決まったこと
 
-- Phase 0 の実機検証の残り2項目を完了。受入テスト1〜4・実機確認のすべてが PASS になり、**Phase 0 完了**（國分さんへ完了判定レポート提示済み・確認待ち）。
-  - 右クリックメニュー「GeminiHall で根拠を監査」からパネルが開き、選択文言が主張欄に入ることを國分さんの Chrome（`0.4.1 試作`）で確認。
-  - Chrome を完全に再起動しても右クリックメニューが残ることを確認。
-  - 監査中に Service Worker が停止したときの「中断」表示は、CDP で実 SW を停止する自動 E2E で確認（実機での再現は任意のため未実施）。
-- 不具合修正（`92a1124`、v0.4.1）: 監査中に Service Worker が停止した後、パネルを開き直してもスピナーのまま固まる問題。パネル初期化時に待ち合わせなしの PING を送って SW を起動し、起動時の処理が `RUNNING` の残骸を「中断」に切り替えるようにした。
-- E2E に2項目追加: 「選択テキスト（pendingInput の反映と消去）」「受入(中断)（実 SW 停止 → 中断表示と `state=INTERRUPTED`）」。通常版・試作版の両ビルドで実行し計42項目。
+- **Phase 0〜3 すべて完了**（各フェーズの完了判定レポートを國分さんへ提示・受入確認済み。Phase 3 は 10/17 未明に提示）。
+  - Phase 0: 実機検証・中断表示を含む全受入 PASS（不具合修正 `92a1124`、拡張 v0.4.1）。
+  - Phase 1: OpenAI `gpt-6-astra` で評価20件をフル実行。誤訂正 0/10・保留 5/5・根拠確認 23/28（82%）・誤キャッシュ 0/3・誤検出 8/8。レポートは `packages/eval/reports/20261016-112109-openai.{json,md}`（`518bf8c`）。受入テスト3件も PASS。README を結果込みに更新（`459d561`）。
+  - Phase 2: 実装は 10/15 済み。ローカル `wrangler dev` + シードで Web E2E 15/15 PASS（公開辞典8・管理7。要件表示はソースでも確認）。
+  - Phase 3: 本番結合テスト（実機E2E）・ログ監査まで PASS（下記）。
+- **実機E2Eの記録（10/16）**: 國分さんの Chrome（拡張 `0.4.1 試作`）で監査（OpenAI `gpt-6.1-sol`）→ 公開申請 `726d6b17-1a7c-4f25-b0c1-647cb277a152`（判定保留・訂正なし・LAW_OR_INSTITUTION）→ 審査画面（Cloudflare Access）で承認（12:15:54Z）→ 掲載。
+  - 承認前に匿名照会（`GET /api/public/lookup?key=4c0a…`）は 404、承認後は 200 になることを本番で確認。
+  - 公開掲載 = `f1d577e4-935e-4ff0-af71-312f187d773f`（PUBLISHED、correction null、監査トレース3段階）。匿名ブラウザ（ヘッドレス Chromium）で一覧・詳細・「利用者のブラウザで監査」注記を確認、ページエラー 0。
+  - TTL 24時間（`expires_at` 2026-10-17T11:47:47Z）。期限後は「再確認が必要」表示に切り替わる設計どおり。
+- **審査画面の改善**: タイトル欄に「主張の最初の一文（40字まで・編集可）」の下書きを自動入力（`c5accf3`）。審査画面 E2E を下書き挙動込みに更新し 15/15 PASS。本番デプロイ済み。
+- ログ監査: `apps/api/src` に console 出力なし。`wrangler tail`（pretty）で監査→申請→審査→照会の全フローを捕捉し、表示はリクエストメタデータのみ（ID 類は CF 側で REDACTED）。キーは BYOK でサーバー不通過、PII 混入なし。
 - OpenAI フォーラム（スレッド 1405409）は 10/16 時点でも承認待ち・回答なし。
 - 補足: 作業中、拡張機能が一度 `chrome://extensions` の一覧から外れて見えた（國分さんが読み込み直しで復旧）。原因は特定できなかった。
 
@@ -20,22 +25,24 @@
 
 | 対象 | 状態 | 確認方法・時点 |
 | --- | --- | --- |
-| GitHub `origin` / NAS `nas` | `main` = 本ドキュメントのコミットまで一致 | `git push`（10/16 20:1x JST） |
-| 拡張機能（手元のビルド） | `0.4.1 試作（ChatGPTログイン） 10/16 20:09`（`.output/chrome-mv3`）。通常版に戻すには `pnpm --filter @geminihall/extension build` | `.output/chrome-mv3/manifest.json` |
-| 実機 Chrome | 0.4.1 試作版を読み込み済み。右クリックメニュー動作・再起動後のメニュー残存を確認済み | 國分さんの操作（10/16） |
-| テスト | 単体 87 件（schema 14、audit-core 28、web 2、eval 8、extension 14、api 21）、E2E 42 件（通常 17、試作 17、ChatGPT ログイン 8） | `pnpm test` / `pnpm typecheck` / `pnpm --filter @geminihall/extension e2e`（10/16） |
-| 本番 Worker `geminihall`（geminihall.cc）・D1・管理画面 | 10/15 から変化なし（前回の handoff 参照） | — |
+| GitHub `origin` / NAS `nas` | `main` = 本ドキュメントのコミットまで一致。**リポジトリは Public（MIT ライセンス）** | `git push` / GitHub API（10/17） |
+| 拡張機能（手元のビルド） | `0.4.1 試作（ChatGPTログイン）`。通常版に戻すには `pnpm --filter @geminihall/extension build` | `.output/chrome-mv3/manifest.json` |
+| 実機 Chrome | 0.4.1 試作版で Phase 3 E2E 実施済み | 國分さんの操作（10/16） |
+| テスト | 単体 87 件、拡張 E2E 42 件、Web E2E 15 件（公開8・管理7） | `pnpm test` / 各 e2e（10/16） |
+| 本番 Worker `geminihall`（geminihall.cc） | Version `a805238b-244e-4f40-aaa7-a6a6d8973e77`（審査画面の下書き改善を反映。API 差分なし）。`/admin/`・`/api/admin/*` は Access 302、公開面は 200 | `wrangler deploy` + curl（10/16 21:1x JST） |
+| 本番 D1 | 申請: APPROVED 2 / REJECTED 1。掲載: PUBLISHED 1 / RETRACTED 1。審査記録 4 件 | `wrangler d1 execute`（10/17 01:25 JST） |
 | OpenAI への問い合わせ | スレッド 1405409、承認待ち・回答なし | 本人・AI 確認（10/16） |
 
 ## 未確認・残課題
 
 - ChatGPT ログインを通常版で有効にするかは OpenAI の回答待ち（回答がなければ通常版は API キー方式のまま）。
-- contextMenus の起動時再登録（onStartup）は、実機でメニュー消失が観測された場合に追加する（今回は消失なし・見送り）。
-- パネル初期化まわりの ms 級レースが潜在（実害は未観測。今回の PING は待ち合わせない形に固定）。
-- `chrome://extensions` から拡張が外れて見えた事象（入れ直しで復旧、原因未特定）。再発したら調べる。
-- Claude での評価実行（有料・余力対応）。
+- **Phase 4（パッケージング・公開）の残り**: 拡張ビルド成果物（ZIP、`pnpm --filter @geminihall/extension zip`）とデモ動画。README の整備（非オラクル原則・Eval の設計と結果）とリポジトリ Public 化は完了済み。
+- 本番掲載1件は 10/17 20:47 JST に TTL 期限（「再確認が必要」表示に切替予定。異常ではない）。
+- contextMenus の起動時再登録（onStartup）は保留のまま（実機でメニュー消失が観測された場合に追加）。
+- パネル初期化まわりの ms 級レースが潜在（実害は未観測）。`chrome://extensions` から外れて見えた事象は再発時に調査。
+- Claude（Anthropic）での評価実行は任意（有料。キーは Agent Keychain にあり）。
 - 余力対応の候補: Chrome ウェブストア公開準備、MCP コネクタ版（Claude・ChatGPT アプリから利用）。
 
 ## 次回最初の一手
 
-OpenAI フォーラムのスレッド 1405409 を確認する。回答があれば、ChatGPT ログインの扱い（通常版で有効化、または指示された方式への作り直し）を決める。回答がなければ、國分さんの確認を得て Phase 1（評価基盤・キャッシュ・公開申請と審査API）に着手する。
+Phase 4 の進め方を國分さんに確認中。承認されれば拡張 ZIP の作成とデモ動画から着手する（README・Public 化は完了済み）。
