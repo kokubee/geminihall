@@ -10,7 +10,8 @@
     "typecheck": "wxt prepare && tsc -p tsconfig.json",
     "test": "vitest run",
     "e2e": "wxt build && node e2e/run.mjs && WXT_SIWC=1 wxt build && WXT_SIWC=1 node e2e/run.mjs && node e2e/siwc.mjs",
-    "build:siwc": "WXT_SIWC=1 wxt build"
+    "build:siwc": "WXT_SIWC=1 wxt build",
+    "demo:video": "node e2e/demo-video.mjs"
   },
   "dependencies": {
     "@geminihall/audit-core": "workspace:*",
