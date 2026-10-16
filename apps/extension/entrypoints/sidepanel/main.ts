@@ -355,6 +355,10 @@ const manifest = chrome.runtime.getManifest() as chrome.runtime.Manifest & { ver
 $<HTMLSpanElement>("app-version").textContent = `v${manifest.version_name ?? manifest.version}`;
 
 async function init() {
+  // Service Worker が停止していた場合に備えて起こしておく（初期化は待たせない）。
+  // 停止前に RUNNING のまま残った監査は、起動時の処理が「中断」に切り替え、
+  // storage の変更通知でこのパネルの表示が更新される（SPEC 第4章⑥）。
+  void chrome.runtime.sendMessage({ type: "PING" }).catch(() => undefined);
   settings = await loadSettings();
   fillSettingsForm();
   await refreshKeyStatus();

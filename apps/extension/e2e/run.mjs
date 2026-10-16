@@ -83,15 +83,18 @@ await context.route(/^https:\/\/api\.(anthropic|openai)\.com\//, async (route) =
   const req = route.request();
   outbound.push({ url: req.url(), headers: await req.allHeaders(), body: req.postData() ?? "" });
   if (delayMs) await new Promise((r) => setTimeout(r, delayMs));
+  // 中断テストでは待機中に Service Worker が停止するため、届かない応答の失敗は無視する。
   if (aiStatus !== 200) {
-    await route.fulfill({
-      status: aiStatus,
-      contentType: "application/json",
-      body: JSON.stringify({ type: "error", error: { type: "authentication_error", message: "invalid x-api-key" } }),
-    });
+    await route
+      .fulfill({
+        status: aiStatus,
+        contentType: "application/json",
+        body: JSON.stringify({ type: "error", error: { type: "authentication_error", message: "invalid x-api-key" } }),
+      })
+      .catch(() => {});
     return;
   }
-  await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(nextBody) });
+  await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(nextBody) }).catch(() => {});
 });
 await context.route(/^https:\/\/geminihall\.cc\//, async (route) => {
   const req = route.request();
@@ -99,11 +102,14 @@ await context.route(/^https:\/\/geminihall\.cc\//, async (route) => {
   serverCalls.push({ method: req.method(), path: url.pathname, query: url.search, headers: await req.allHeaders(), body: req.postData() ?? "" });
   if (url.pathname === "/api/public/lookup") {
     const entry = publicEntries.get(url.searchParams.get("key"));
-    await route.fulfill(
-      entry
-        ? { status: 200, contentType: "application/json", body: JSON.stringify({ entry }) }
-        : { status: 404, contentType: "application/json", body: JSON.stringify({ error: { code: "NOT_FOUND", message: "none", request_id: null } }) },
-    );
+    // 中断テストでは照会の途中で Service Worker が停止することがある。
+    await route
+      .fulfill(
+        entry
+          ? { status: 200, contentType: "application/json", body: JSON.stringify({ entry }) }
+          : { status: 404, contentType: "application/json", body: JSON.stringify({ error: { code: "NOT_FOUND", message: "none", request_id: null } }) },
+      )
+      .catch(() => {});
     return;
   }
   if (url.pathname === "/api/submissions" && req.method() === "POST") {
@@ -130,6 +136,14 @@ if (!sw) sw = await context.waitForEvent("serviceworker");
 sw.on("console", (m) => consoleLines.push(m.text()));
 const extensionId = new URL(sw.url()).host;
 const panelUrl = `chrome-extension://${extensionId}/sidepanel.html`;
+
+// 中断テスト用: DevTools プロトコルで拡張機能の Service Worker を実際に停止する。
+const cdp = await context.browser().newBrowserCDPSession();
+await cdp.send("Target.setDiscoverTargets", { discover: true });
+async function extensionWorkerTargets() {
+  const { targetInfos } = await cdp.send("Target.getTargets");
+  return targetInfos.filter((t) => t.type === "service_worker" && t.url.startsWith(`chrome-extension://${extensionId}/`));
+}
 
 async function openSettings(p) {
   await p.evaluate(() => {
@@ -377,6 +391,49 @@ await check("キー消失の説明: 設定画面に消える場面が書かれ�
   await page.click("#run");
   await page.waitForSelector("#status .error", { timeout: 10000 });
   assert.ok((await page.textContent("#status .error")).includes("以前に入力したキーは消えています"));
+});
+
+await check("選択テキスト: 右クリックメニューが渡す pendingInput を claim 欄に反映し、使い終えたら消す", async () => {
+  const sample = "右クリックで選択したテキストの主張";
+  await page.close();
+  await sw.evaluate(async (claim) => {
+    await chrome.storage.session.set({ "audit.pendingInput": { claim, createdAt: new Date().toISOString() } });
+  }, sample);
+  page = await openPanel();
+  await page.waitForFunction((want) => (document.querySelector("#claim"))?.value === want, sample, { timeout: 5000 });
+  const left = await page.evaluate(async () => (await chrome.storage.session.get("audit.pendingInput"))["audit.pendingInput"] ?? null);
+  assert.equal(left, null);
+});
+
+await check("受入(中断): 監査中に Service Worker が停止した場合、パネルを開き直すと「中断」表示に切り替わる", async () => {
+  await openSettings(page);
+  await page.fill("#api-key", FAKE_KEY);
+  await page.click("#settings-form button[type=submit]");
+  await page.waitForFunction(() => document.querySelector("#key-status")?.textContent?.includes("入力済み"));
+  delayMs = 8000;
+  await page.fill("#claim", "中断の検証に使う主張");
+  await page.click("#run");
+  await page.waitForSelector("#status .running", { timeout: 5000 });
+  const targets = await extensionWorkerTargets();
+  assert.equal(targets.length, 1, "extension service worker target not found");
+  const closed = await cdp.send("Target.closeTarget", { targetId: targets[0].targetId });
+  assert.equal(closed.success, true);
+  let remaining = await extensionWorkerTargets(); // 停止の反映には数百msかかることがある
+  for (let i = 0; remaining.length > 0 && i < 10; i++) {
+    await new Promise((r) => setTimeout(r, 300));
+    remaining = await extensionWorkerTargets();
+  }
+  assert.equal(remaining.length, 0, "service worker is still running after Target.closeTarget");
+  const stateAfterKill = await page.evaluate(async () => (await chrome.storage.session.get("audit.currentJob"))["audit.currentJob"]?.state ?? null);
+  assert.equal(stateAfterKill, "RUNNING", "audit should still be RUNNING at this point");
+  await page.close();
+  page = await openPanel(); // パネルを開くと PING が Service Worker を起こし、起動時の処理が「中断」に切り替える
+  await page.waitForFunction(() => document.querySelector("#status")?.textContent?.includes("停止しました"), null, { timeout: 10000 });
+  const interrupted = await page.evaluate(async () => (await chrome.storage.session.get("audit.currentJob"))["audit.currentJob"] ?? null);
+  assert.equal(interrupted?.state, "INTERRUPTED");
+  const contexts = await page.evaluate(() => chrome.runtime.getContexts({ contextTypes: ["BACKGROUND"] }));
+  assert.ok(contexts.length > 0, "background context should have been woken by the panel");
+  delayMs = 0;
 });
 
 await check("通信先: 拡張が通信したのは各社APIと geminihall.cc だけで、サーバーへの通信にキーが含まれない", async () => {
