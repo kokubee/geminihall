@@ -62,6 +62,12 @@ function message(kind: "ok" | "error", text: string) {
 
 const STATE_LABEL: Record<string, string> = { PENDING: "審査待ち", APPROVED: "承認済み", REJECTED: "却下" };
 
+function suggestTitle(claim: string): string {
+  const first = claim.split(/[。！？\n]/u)[0]?.replace(/\s+/gu, " ").trim() ?? "";
+  const base = first || claim.replace(/\s+/gu, " ").trim();
+  return base.length > 40 ? `${base.slice(0, 40)}…` : base;
+}
+
 async function renderList(state: string) {
   const tabs = h(
     "nav",
@@ -213,6 +219,7 @@ async function renderSubmission(id: string) {
 
   if (s.review_state === "PENDING") {
     const title = h("input", { type: "text", maxlength: "200", required: "" }) as HTMLInputElement;
+    title.value = suggestTitle(s.original_claim);
     const claim = h("textarea", { rows: "3", maxlength: "4000", required: "" }) as HTMLTextAreaElement;
     claim.value = s.original_claim;
     const correction = h("textarea", { rows: "3", maxlength: "4000" }) as HTMLTextAreaElement;

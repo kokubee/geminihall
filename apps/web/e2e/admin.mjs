@@ -87,10 +87,12 @@ await check("一覧: 審査待ちの申請が並び、審査者が表示され�
   assert.equal(await page.$$eval(".table tbody tr", (rows) => rows.length), 2);
 });
 
-await check("承認: 必須項目が空なら送らず、入力後は管理用ヘッダー付きで APPROVE を送る", async () => {
+await check("承認: タイトルが下書きされ、空にすると送られず、入力後に APPROVE を送る", async () => {
   await page.click(`a[href="#/submission/${confirmed.request_id}"]`);
   await page.waitForSelector("form.form");
   assert.ok((await page.textContent(".sources")).includes("監査中に取得"));
+  assert.equal(await page.$eval("form.form input", (el) => el.value), "日本国憲法は1950年5月3日に施行された");
+  await page.fill("form.form input >> nth=0", "");
   await page.click("button[type=submit]");
   await page.waitForTimeout(500);
   assert.equal(posts.length, 0);
@@ -105,9 +107,10 @@ await check("承認: 必須項目が空なら送らず、入力後は管理用�
   assert.ok(posts[0].body.correction.includes("1947"));
 });
 
-await check("判定保留の申請: 訂正欄は無効で、承認時に訂正を送らない", async () => {
+await check("判定保留の申請: タイトルが下書きされ、訂正欄は無効で、承認時に訂正を送らない", async () => {
   await page.goto(`${BASE}/admin/#/submission/${abstained.request_id}`);
   await page.waitForSelector("form.form");
+  assert.equal(await page.$eval("form.form input", (el) => el.value), "邪馬台国は九州にあった");
   assert.equal(await page.isDisabled("form.form textarea >> nth=1"), true);
   await page.fill("form.form input >> nth=0", "邪馬台国の所在地");
   await page.click("button[type=submit]");
