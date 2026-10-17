@@ -10,7 +10,7 @@
 - **ChatGPT サブスク対応（2026-10-17 午前）**: Sign in with ChatGPT（ChatGPT Plus / Pro の利用枠でのログイン）を通常ビルドに昇格した（拡張 v0.5.0、`WXT_SIWC` のビルド切り替えを廃止）。
   - 標準ビルドに `declarativeNetRequest`・`auth.openai.com`・`127.0.0.1`・`siwc-callback.html` を含める。トークンはメモリ上（`chrome.storage.session`）のみ・ブラウザ終了や更新で再ログイン、という試作時の制約はそのまま。
   - UI・README・SPEC（v2.2）を更新（「試作」表記の削除、メモリ保持・再ログイン・OpenAI 側の仕様変更リスクの明記）。OpenAI フォーラムの回答は依然ないまま（搭載は國分さんの判断）。
-  - 検証: 型検査・単体 14・E2E 25 件（通常 17＋ChatGPT ログイン 8）すべて PASS。ZIP `geminihallextension-0.5.0-chrome.zip`（190KB）を作成し、ビルドと完全一致（`diff -rq`）を確認。
+  - 検証: 型検査・単体 14・E2E 25 件（通常 17＋ChatGPT ログイン 8）すべて PASS。ZIP `geminihallextension-0.5.0-chrome.zip`（189KB）を作成し、ビルドと完全一致（`diff -rq`）。**GitHub Release v0.5.0 に添付公開済み**（https://github.com/kokubee/geminihall/releases/tag/v0.5.0。匿名ダウンロードの sha256 一致 `1a2d0b36…` まで確認）。
 - **Phase 0〜4 すべて完了**（各フェーズの完了判定レポートを國分さんへ提示・受入確認済み。10/16 セッション）。
   - Phase 0: 実機検証・中断表示を含む全受入 PASS（不具合修正 `92a1124`、拡張 v0.4.1）。
   - Phase 1: OpenAI `gpt-6-astra` で評価20件をフル実行。誤訂正 0/10・保留 5/5・根拠確認 23/28（82%）・誤キャッシュ 0/3・誤検出 8/8。レポートは `packages/eval/reports/20261016-112109-openai.{json,md}`（`518bf8c`）。受入テスト3件も PASS。README を結果込みに更新（`459d561`）。
@@ -30,8 +30,8 @@
 
 | 対象 | 状態 | 確認方法・時点 |
 | --- | --- | --- |
-| GitHub `origin` / NAS `nas` | `main` = 本ドキュメントのコミットまで一致。Public（MIT）。Release `v0.4.1` 公開済み・`v0.5.0` は未作成 | `git push` / `gh release view`（10/17） |
-| 拡張機能の配布物 | `geminihallextension-0.4.1-chrome.zip` を Release v0.4.1 に添付済み。**v0.5.0 の ZIP（190KB）はローカル作成済み・Release 未作成（確認待ち）** | `diff -rq`（10/17 11:47） |
+| GitHub `origin` / NAS `nas` | `main` = 本ドキュメントのコミットまで一致。Public（MIT）。Release `v0.4.1` / `v0.5.0` 公開済み | `git push` / `gh release view`（10/17） |
+| 拡張機能の配布物 | `geminihallextension-0.4.1-chrome.zip`（Release v0.4.1）と `geminihallextension-0.5.0-chrome.zip`（Release v0.5.0）を添付済み。v0.5.0 は匿名ダウンロードの sha256 一致を確認 | `diff -rq` / `shasum`（10/17 11:5x JST） |
 | 拡張機能（手元のビルド） | `.output/chrome-mv3` = **0.5.0 通常版（ChatGPT ログイン込み）**、`version_name 0.5.0 10/17 11:47` | `manifest.json`（10/17） |
 | 実機 Chrome | 0.4.1 試作を読み込み済み（Phase 3 E2E 実施）。**0.5.0 は未読み込み** | 國分さんの操作（10/16） |
 | テスト | 単体 87 件、拡張 E2E 25 件（通常17・ChatGPT ログイン8）、Web E2E 15 件（公開8・管理7） | `pnpm test` / 各 e2e（10/17） |
@@ -41,8 +41,7 @@
 
 ## 未確認・残課題
 
-- **0.5.0 の実機ロードと ChatGPT ログイン監査は未確認**（同じコードの 0.4.1 試作では実機確認済み）。次回、`chrome://extensions` で再読み込みし、ChatGPT ログインで1回監査して確認する。
-- **Release v0.5.0 は未作成**（ZIP はローカルの `.output/` に作成済み。添付は zip 1件の予定）。
+- 0.5.0 の実機ロードと ChatGPT ログイン監査は未確認（同じコードの 0.4.1 試作では実機確認済み）。次回、`chrome://extensions` で再読み込みし、ChatGPT ログインで1回監査して確認する。
 - OpenAI の回答はないまま通常ビルドへ搭載した（SPEC v2.2）。回答が来た場合の扱い（継続・修正）は再判断。
 - 本番掲載1件は 10/17 20:47 JST に TTL 期限（「再確認が必要」表示に切替予定。異常ではない）。
 - contextMenus の起動時再登録（onStartup）は保留のまま（実機でメニュー消失が観測された場合に追加）。
@@ -52,4 +51,4 @@
 
 ## 次回最初の一手
 
-`.output/chrome-mv3`（0.5.0）を実機の Chrome に読み込み（`chrome://extensions` → GeminiHall を再読み込み）、設定で「ChatGPT（サブスクでログイン）」を選んでログイン→1回監査。問題なければ GitHub Release v0.5.0 を作成（`geminihallextension-0.5.0-chrome.zip` を添付）し、その旨を記録する。
+`.output/chrome-mv3`（0.5.0）を実機の Chrome に読み込み（`chrome://extensions` → GeminiHall を再読み込み）、設定で「ChatGPT（サブスクでログイン）」を選んでログイン→1回監査。問題があれば Release v0.5.0 の対応（修正版の再リリース）を検討する。
