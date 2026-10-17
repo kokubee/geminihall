@@ -174,10 +174,10 @@ await page.evaluate(() => {
   document.getElementById("settings").open = true;
 });
 
-await check("試作の表示: ChatGPT を選ぶとキー欄が消え、試作である旨とログインボタンが出る", async () => {
+await check("サブスクの表示: ChatGPT を選ぶとキー欄が消え、プランの説明とログインボタンが出る", async () => {
   await page.selectOption("#provider", "CHATGPT_PLAN");
   assert.equal(await page.isVisible("#api-key"), false);
-  assert.ok((await page.textContent("#siwc-section")).includes("試作機能です"));
+  assert.ok((await page.textContent("#siwc-section")).includes("ChatGPT Plus / Pro"));
   assert.equal(await page.textContent("#siwc-login"), "Continue with ChatGPT");
 });
 

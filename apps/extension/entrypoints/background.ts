@@ -179,7 +179,7 @@ async function startAudit(claim: string, context: string | undefined, force: boo
       : null;
   const needsLookup = !force && settings.publicLookup;
   const missingKeyMessage = usePlan
-    ? "ChatGPT にログインしていません。設定画面の「Continue with ChatGPT」からログインしてください（試作機能）。"
+    ? "ChatGPT にログインしていません。設定画面の「Continue with ChatGPT」からログインしてください。"
     : (await wasKeyEntered(provider))
       ? KEY_LOSS_NOTE
       : "APIキーが設定されていません。設定画面で入力してください。";

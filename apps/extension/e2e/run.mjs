@@ -161,13 +161,12 @@ async function openPanel() {
 
 let page = await openPanel();
 
-await check("ビルドの種類: ChatGPT ログインの選択肢と権限は試作ビルドにだけ含まれる", async () => {
-  const siwc = process.env.WXT_SIWC === "1";
+await check("ChatGPT ログイン: 標準ビルドに選択肢と権限が含まれる", async () => {
   const manifest = await sw.evaluate(() => chrome.runtime.getManifest());
-  assert.equal(manifest.permissions.includes("declarativeNetRequest"), siwc);
-  assert.equal(manifest.host_permissions.some((h) => h.includes("auth.openai.com") || h.includes("127.0.0.1")), siwc);
-  assert.equal((await page.$('#provider option[value="CHATGPT_PLAN"]')) !== null, siwc);
-  assert.equal(manifest.version_name.includes("試作"), siwc);
+  assert.equal(manifest.permissions.includes("declarativeNetRequest"), true);
+  assert.equal(manifest.host_permissions.some((h) => h.includes("auth.openai.com") || h.includes("127.0.0.1")), true);
+  assert.equal((await page.$('#provider option[value="CHATGPT_PLAN"]')) !== null, true);
+  assert.equal(manifest.version_name.includes("試作"), false);
 });
 
 await check("設定: 偽キーを保存でき、パネルには伏せ字だけが表示される", async () => {

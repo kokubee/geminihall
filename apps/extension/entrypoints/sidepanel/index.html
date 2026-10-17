@@ -20,7 +20,7 @@
           <select id="provider">
             <option value="ANTHROPIC">Claude（APIキー）</option>
             <option value="OPENAI">OpenAI（APIキー）</option>
-            <option value="CHATGPT_PLAN">ChatGPT（サブスクでログイン・試作）</option>
+            <option value="CHATGPT_PLAN">ChatGPT（サブスクでログイン）</option>
           </select>
         </label>
         <div id="key-fields">
@@ -36,8 +36,9 @@
         </div>
         <div id="siwc-section" hidden>
           <div class="key-notice">
-            <p><strong>試作機能です。</strong>ChatGPT Plus / Pro の利用枠で監査します。API キーは使いません。</p>
-            <p>OpenAI は、ログインで受け取る情報をブラウザに保存しないよう求めています。この試作では、ログインの情報をメモリ上にだけ置き、ディスクには保存しません。そのため、ブラウザを閉じたときや拡張機能を更新したときは、もう一度ログインが必要です。正式に提供するかどうかは、OpenAI の回答を待って決めます。</p>
+            <p><strong>ChatGPT Plus / Pro の利用枠で監査します。</strong>API キーは使いません。</p>
+            <p>ログインで受け取った情報はメモリ上にだけ置き、ディスクには保存しません。そのため、ブラウザを閉じたときや拡張機能を更新したときは、もう一度ログインが必要です。</p>
+            <p>この方式は OpenAI のアカウント認可を利用しています。OpenAI 側の仕様変更により、使えなくなることがあります。</p>
           </div>
           <div id="siwc-welcome" class="welcome" hidden>
             <p><strong>ChatGPT のプランを使っています</strong></p>
