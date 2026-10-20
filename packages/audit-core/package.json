@@ -15,7 +15,7 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.133.0",
+    "@anthropic-ai/sdk": "^0.135.0",
     "@geminihall/schema": "workspace:*",
     "openai": "~7.28.0",
     "zod": "^4.6.7"
