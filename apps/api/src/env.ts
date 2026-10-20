@@ -5,6 +5,7 @@ export interface Env {
   ACCESS_ADMIN_EMAILS?: string;
   CONSENT_VERSION: string;
   SUBMIT_LIMITER?: RateLimit;
+  SUBMIT_TOKEN_LIMITER?: RateLimit;
 }
 
 export type AppEnv = { Bindings: Env; Variables: { reviewerId: string } };

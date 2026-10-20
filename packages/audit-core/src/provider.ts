@@ -1,4 +1,4 @@
-import { ModelAuditOutputSchema, type ModelAuditOutput } from "@geminihall/schema";
+import { BoundedModelAuditOutputSchema, ModelAuditOutputSchema, type ModelAuditOutput } from "@geminihall/schema";
 import { z } from "zod";
 import { ModelOutputError } from "./errors";
 
@@ -56,7 +56,7 @@ export function parseModelJson(text: string): ModelAuditOutput {
   } catch {
     throw new ModelOutputError(`model output is not valid JSON (length ${text.length}: "${preview(text)}")`);
   }
-  const parsed = ModelAuditOutputSchema.safeParse(json);
+  const parsed = BoundedModelAuditOutputSchema.safeParse(json);
   if (!parsed.success) throw new ModelOutputError(`model output failed schema: ${parsed.error.message}`);
   return parsed.data;
 }

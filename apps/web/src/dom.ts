@@ -19,6 +19,11 @@ export function safeHttpUrl(raw: string): string | null {
   }
 }
 
+export function safeHttpHost(raw: string): string | null {
+  const safeUrl = safeHttpUrl(raw);
+  return safeUrl ? new URL(safeUrl).hostname : null;
+}
+
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("ja-JP", { year: "numeric", month: "long", day: "numeric" });
 }

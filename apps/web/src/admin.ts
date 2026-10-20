@@ -1,5 +1,5 @@
 import type { AuditResult } from "@geminihall/schema";
-import { formatDateTime, h, safeHttpUrl } from "./dom";
+import { formatDateTime, h, safeHttpHost, safeHttpUrl } from "./dom";
 import { CATEGORY_LABEL, PROVIDER_LABEL, STATUS_LABEL, SUB_LABEL } from "./labels";
 import type { PublishedEntry } from "./types";
 import { statusBadge } from "./views";
@@ -169,16 +169,19 @@ function resultSection(r: AuditResult) {
     h("h2", {}, "主張の分解"),
     h("ul", { class: "subclaims" }, ...r.audit_trace.decomposed_claims.map((c) => h("li", {}, h("span", { class: `pill pill-${c.status.toLowerCase()}` }, SUB_LABEL[c.status]), c.sub_claim, h("div", { class: "muted small" }, `照合先: ${c.verification_target}`)))),
     h("h2", {}, "根拠（リンク先を開いて内容を確認してください）"),
+    h("p", { class: "muted" }, "根拠URLの取得・照合状況（verified）はクライアント申告です。ホスト名とリンク先の内容を確認してください。"),
     h(
       "ul",
       { class: "sources" },
       ...r.evidence_sources.map((s) => {
         const href = safeHttpUrl(s.url);
+        const host = safeHttpHost(s.url);
         return h(
           "li",
           {},
-          h("span", { class: s.verified ? "pill pill-supported" : "pill pill-unverifiable" }, s.verified ? "監査中に取得" : "未確認"),
+          h("span", { class: s.verified ? "pill pill-supported" : "pill pill-unverifiable" }, s.verified ? "取得済みと申告" : "未確認と申告"),
           href ? h("a", { href, target: "_blank", rel: "noopener noreferrer" }, s.title) : h("span", {}, `${s.title}（リンク不可）`),
+          h("div", { class: "muted small" }, `ホスト名: ${host ?? "URLを確認できません"}`),
           h("div", { class: "muted small url" }, s.url),
           h("blockquote", {}, s.snippet),
         );

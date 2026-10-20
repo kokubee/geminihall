@@ -1,6 +1,13 @@
 import { Hono, type Context } from "hono";
+import { secureHeaders } from "hono/secure-headers";
 import { z } from "zod";
-import { AuditResultSchema, CategoryEnum, MAX_CLAIM_LENGTH, MAX_CONTEXT_LENGTH } from "@geminihall/schema";
+import {
+  AuditResultSchema,
+  CategoryEnum,
+  MAX_CLAIM_LENGTH,
+  MAX_CONTEXT_LENGTH,
+  TTL_DURATION_MS,
+} from "@geminihall/schema";
 import { cacheIdentity } from "@geminihall/audit-core/identity";
 import type { AppEnv } from "./env";
 import type { AdminVerifier } from "./access";
@@ -8,8 +15,58 @@ import { errorBody } from "./http";
 
 const MIN_TOKEN_LENGTH = 32;
 const MAX_TOKEN_LENGTH = 256;
+const MAX_SUBMISSION_BODY_BYTES = 64 * 1024;
 const PAGE_SIZE = 50;
 const HEX64 = /^[0-9a-f]{64}$/;
+
+type BoundedJsonResult = { kind: "ok"; value: unknown } | { kind: "invalid" } | { kind: "too_large" };
+
+async function readBoundedJson(request: Request): Promise<BoundedJsonResult> {
+  const contentLength = request.headers.get("Content-Length");
+  if (contentLength !== null) {
+    if (!/^\d+$/u.test(contentLength)) return { kind: "invalid" };
+    if (Number(contentLength) > MAX_SUBMISSION_BODY_BYTES) return { kind: "too_large" };
+  }
+
+  const body = request.body;
+  if (!body) return { kind: "invalid" };
+  const reader = body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value) continue;
+      totalBytes += value.byteLength;
+      if (totalBytes > MAX_SUBMISSION_BODY_BYTES) {
+        try {
+          await reader.cancel();
+        } catch {
+          // The request is already being rejected; cancellation is best-effort.
+        }
+        return { kind: "too_large" };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { kind: "invalid" };
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try {
+    return { kind: "ok", value: JSON.parse(new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(bytes)) as unknown };
+  } catch {
+    return { kind: "invalid" };
+  }
+}
 
 async function sha256Hex(input: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
@@ -126,29 +183,54 @@ export function createApp(verifyAdmin: AdminVerifier, clock: () => number = Date
   const app = new Hono<AppEnv>();
   const nowIso = () => new Date(clock()).toISOString();
 
+  app.use(
+    "/api/*",
+    secureHeaders({
+      contentSecurityPolicy: {
+        defaultSrc: ["'none'"],
+        baseUri: ["'none'"],
+        frameAncestors: ["'none'"],
+        formAction: ["'none'"],
+      },
+      referrerPolicy: "strict-origin-when-cross-origin",
+      strictTransportSecurity: "max-age=31536000",
+      xContentTypeOptions: "nosniff",
+      xFrameOptions: "DENY",
+    }),
+  );
+
   app.get("/api/health", (c) => c.json({ ok: true }));
 
   app.post("/api/submissions", async (c) => {
     const owner = await clientKeyHash(c);
     if (!owner) return c.json(errorBody("UNAUTHORIZED_REQUEST_ACCESS", "クライアントトークンがありません。"), 403);
 
+    const ip = c.req.header("CF-Connecting-IP") ?? "unknown";
     if (c.env.SUBMIT_LIMITER) {
-      const ip = c.req.header("CF-Connecting-IP") ?? "unknown";
-      const { success } = await c.env.SUBMIT_LIMITER.limit({ key: `${ip}|${owner}` });
+      const { success } = await c.env.SUBMIT_LIMITER.limit({ key: ip });
+      if (!success) return c.json(errorBody("RATE_LIMITED", "申請が多すぎます。時間をおいてから申請してください。"), 429);
+    }
+    if (c.env.SUBMIT_TOKEN_LIMITER) {
+      const { success } = await c.env.SUBMIT_TOKEN_LIMITER.limit({ key: owner });
       if (!success) return c.json(errorBody("RATE_LIMITED", "申請が多すぎます。時間をおいてから申請してください。"), 429);
     }
 
-    let raw: unknown;
-    try {
-      raw = await c.req.json();
-    } catch {
+    const rawBody = await readBoundedJson(c.req.raw);
+    if (rawBody.kind === "too_large") {
+      return c.json(errorBody("INVALID_INPUT", "リクエスト本文が大きすぎます。"), 413);
+    }
+    if (rawBody.kind === "invalid") {
       return c.json(errorBody("INVALID_INPUT", "リクエスト本文が JSON ではありません。"), 400);
     }
-    const parsed = SubmissionRequestSchema.safeParse(raw);
+    const parsed = SubmissionRequestSchema.safeParse(rawBody.value);
     if (!parsed.success) return c.json(errorBody("INVALID_INPUT", "申請内容が不正です。"), 400);
     const body = parsed.data;
     const result = body.result;
     const submissionId = result.request_id;
+
+    if (Date.parse(result.verified_at) > clock()) {
+      return c.json(errorBody("INVALID_INPUT", "監査日時が未来になっています。", submissionId), 400);
+    }
 
     if (result.mode !== "LIVE") {
       return c.json(errorBody("INVALID_INPUT", "DEMO の結果は申請できません。", submissionId), 400);
@@ -240,6 +322,9 @@ export function createApp(verifyAdmin: AdminVerifier, clock: () => number = Date
       return c.json(errorBody("INVALID_INPUT", "カテゴリが不正です。"), 400);
     }
     const before = c.req.query("before");
+    if (before !== undefined && !z.string().datetime().safeParse(before).success) {
+      return c.json(errorBody("INVALID_INPUT", "日時カーソルが不正です。"), 400);
+    }
     const params: unknown[] = [];
     let sql = "SELECT * FROM public_entries WHERE publication_status = 'PUBLISHED'";
     if (category) {
@@ -368,6 +453,11 @@ export function createApp(verifyAdmin: AdminVerifier, clock: () => number = Date
     }
 
     const result = AuditResultSchema.parse(JSON.parse(submission.result_json));
+    const verifiedAtMs = Date.parse(result.verified_at);
+    if (!Number.isFinite(verifiedAtMs) || verifiedAtMs > clock()) {
+      return c.json(errorBody("INVALID_INPUT", "監査日時が未来になっています。", submission.submission_id), 400);
+    }
+    const expiresAt = new Date(verifiedAtMs + TTL_DURATION_MS[result.ttl_category]).toISOString();
     const correction =
       result.audit_status === "UNVERIFIED_OR_AMBIGUOUS"
         ? null
@@ -408,7 +498,7 @@ export function createApp(verifyAdmin: AdminVerifier, clock: () => number = Date
           result.auditor.provider,
           result.auditor.model,
           result.verified_at,
-          result.expires_at,
+          expiresAt,
           now,
         ),
       db

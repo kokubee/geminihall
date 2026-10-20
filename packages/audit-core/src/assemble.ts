@@ -1,12 +1,5 @@
-import { AuditResultSchema, type AuditResult, type ModelAuditOutput } from "@geminihall/schema";
+import { AuditResultSchema, TTL_DURATION_MS, type AuditResult, type ModelAuditOutput } from "@geminihall/schema";
 import { normalizeUrl } from "./normalize";
-
-const TTL_MS: Record<AuditResult["ttl_category"], number> = {
-  HISTORICAL_FACT: 30 * 24 * 60 * 60 * 1000,
-  LAW_OR_INSTITUTION: 24 * 60 * 60 * 1000,
-  CURRENT_NEWS: 60 * 60 * 1000,
-  REALTIME: 0,
-};
 
 const DOWNGRADE_LIMITATION = "外部の検索結果で裏付けを確認できなかったため、判定を保留しました。";
 const DOWNGRADE_REASON = "監査中に取得した外部ソースで、判定の根拠を確認できなかったため。";
@@ -88,7 +81,7 @@ export function assembleResult(args: AssembleArgs): AssembleOutcome {
     category,
     ttl_category: model.ttl_category,
     verified_at: now,
-    expires_at: new Date(args.nowMs + TTL_MS[model.ttl_category]).toISOString(),
+    expires_at: new Date(args.nowMs + TTL_DURATION_MS[model.ttl_category]).toISOString(),
     evidence_checked_at: args.searchUsed ? now : null,
     normalized_claim: args.normalizedClaim,
     context_fingerprint: args.contextFingerprint,

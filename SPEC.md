@@ -124,6 +124,11 @@
   1. `CONFIRMED_HALLUCINATION`: `evidence_status = VERIFIED`、`verified = true` の根拠1件以上、`hallucinated_claim` と `correction` が必須。
   2. `SUPPORTED_CLAIM`: `evidence_status = VERIFIED`、`verified = true` の根拠1件以上が必須。
   3. `UNVERIFIED_OR_AMBIGUOUS`: `correction = null`。`limitations` 1件以上と `audit_trace.abstention_reason` が必須。
+* **入力上限**: 監査対象の主張 4,000 文字、文脈 2,000 文字。公開申請の JSON 本文は UTF-8 で 64 KiB 以下とし、超過は `413` を返す。監査結果は model 100文字、根拠タイトル300文字・URL 2,048文字・snippet 2,000文字、分解した主張30件（各2,000文字）、照合先各1,000文字、照合説明8,000文字、根拠20件、limitations 20件（各2,000文字）を上限とする。その他の監査結果テキストにもスキーマで上限を設定する。
+* **公開申請の乱用対策**: `POST /api/submissions` は IP 単位とクライアントトークン単位で、それぞれ 60 秒に10件を上限とする。トークンはハッシュ値を制限キーに使う。
+* **公開データの期限と信頼境界**: `verified_at` がサーバー時刻より未来の申請は拒否する。公開承認時の `expires_at` はクライアント値を使わず、`verified_at + ttl_category` の規定期間からサーバーが再計算する。根拠の `verified` はクライアント申告値であり、審査画面にその旨と URL のホスト名を表示する。審査者はリンク先と根拠内容を確認する。
+* **プロンプト境界**: 主張・文脈・locale はプロンプトへ埋め込む前にエスケープし、入力中のタグ文字列で `<claim>` / `<context>` の区切りを閉じられないようにする。
+* **HTTP セキュリティヘッダー**: API 応答には CSP（`default-src 'none'`、`frame-ancestors 'none'` 等）、`nosniff`、`Referrer-Policy: strict-origin-when-cross-origin`、HSTS を設定する。静的サイトには CSP（`default-src 'self'`、`frame-ancestors 'none'` 等）、同じ `nosniff`・Referrer Policy・HSTS を設定する。
 * **API 標準エラー応答**
 
 ```json

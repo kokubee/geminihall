@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { auditOutputJsonSchema } from "../src/index";
+import { auditOutputJsonSchema, ModelOutputError, extractJsonText } from "../src/index";
+import { parseModelJson } from "../src/provider";
+import { confirmedOutput } from "./helpers";
 
 describe("structured output schema", () => {
   it("uses no numeric or string constraint keywords that structured outputs reject", () => {
@@ -24,9 +26,6 @@ describe("structured output schema", () => {
   });
 });
 
-import { ModelOutputError, extractJsonText } from "../src/index";
-import { parseModelJson } from "../src/provider";
-
 describe("model JSON extraction", () => {
   it("unwraps code fences and surrounding prose", () => {
     expect(extractJsonText('```json\n{"a":1}\n```')).toBe('{"a":1}');
@@ -44,5 +43,11 @@ describe("model JSON extraction", () => {
       expect((e as Error).message).toContain("[redacted]");
       expect((e as Error).message).not.toContain("abcdefghijklmnop");
     }
+  });
+
+  it("rejects model fields that exceed the post-generation bounds", () => {
+    const output = confirmedOutput(["https://example.com"]);
+    output.evidence_sources[0]!.snippet = "x".repeat(2001);
+    expect(() => parseModelJson(JSON.stringify(output))).toThrow(ModelOutputError);
   });
 });

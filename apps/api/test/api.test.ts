@@ -49,6 +49,28 @@ describe("submissions", () => {
     expect(res.status).toBe(400);
   });
 
+  it("rejects a future verified_at timestamp", async () => {
+    const { res } = await submit("未来日時の主張", TOKEN_A, { verified_at: "2026-10-16T00:00:00.000Z" });
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ error: { code: "INVALID_INPUT" } });
+  });
+
+  it("returns 413 for a request body over 64 KiB", async () => {
+    const body = JSON.stringify({ padding: "x".repeat(65_536) });
+    for (const headers of [
+      { "content-type": "application/json", "X-Client-Token": TOKEN_A },
+      {
+        "content-type": "application/json",
+        "X-Client-Token": TOKEN_A,
+        "Content-Length": String(new TextEncoder().encode(body).byteLength),
+      },
+    ]) {
+      const res = await call("/api/submissions", { method: "POST", headers, body });
+      expect(res.status).toBe(413);
+      expect(await res.json()).toMatchObject({ error: { code: "INVALID_INPUT" } });
+    }
+  });
+
   it("rejects DEMO results", async () => {
     const { res } = await submit("主張D", TOKEN_A, { mode: "DEMO" });
     expect(res.status).toBe(400);
@@ -113,12 +135,17 @@ describe("受入3: only approved entries are public", () => {
     expect(pending.res.status).toBe(201);
   });
 
-  it("stops returning an entry from lookup after it expires", async () => {
-    const s = await submit("期限切れになる主張", TOKEN_A, { expires_at: "2026-10-16T00:00:00.000Z" });
+  it("recomputes publication expiry from verified_at and ttl_category", async () => {
+    const s = await submit("期限切れになる主張", TOKEN_A, {
+      ttl_category: "CURRENT_NEWS",
+      expires_at: "2036-10-15T00:00:00.000Z",
+    });
     await approve(s.result.request_id);
     const key = (await cacheIdentity({ claim: "期限切れになる主張", locale: "ja" })).claimCacheKey;
     expect((await call(`/api/public/lookup?key=${key}`)).status).toBe(200);
-    setNow("2026-10-17T00:00:00.000Z");
+    const detail = await call(`/api/public/lookup?key=${key}`);
+    expect(await detail.json()).toMatchObject({ entry: { expires_at: "2026-10-15T01:00:00.000Z" } });
+    setNow("2026-10-15T01:00:00.000Z");
     expect((await call(`/api/public/lookup?key=${key}`)).status).toBe(404);
     setNow("2026-10-15T00:00:00.000Z");
   });
@@ -183,5 +210,22 @@ describe("public listing", () => {
 
   it("validates the lookup key format", async () => {
     expect((await call("/api/public/lookup?key=abc")).status).toBe(400);
+  });
+
+  it("validates the before datetime cursor", async () => {
+    expect((await call("/api/public/entries?before=abc")).status).toBe(400);
+    expect((await call("/api/public/entries?before=2026-10-15T00%3A00%3A00.000Z")).status).toBe(200);
+  });
+});
+
+describe("API security headers", () => {
+  it("sets security headers on API responses", async () => {
+    const res = await call("/api/health");
+    expect(res.headers.get("content-security-policy")).toContain("default-src 'none'");
+    expect(res.headers.get("content-security-policy")).toContain("frame-ancestors 'none'");
+    expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(res.headers.get("referrer-policy")).toBe("strict-origin-when-cross-origin");
+    expect(res.headers.get("strict-transport-security")).toBe("max-age=31536000");
+    expect(res.headers.get("x-frame-options")).toBe("DENY");
   });
 });

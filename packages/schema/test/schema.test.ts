@@ -99,6 +99,22 @@ describe("structural checks", () => {
   it("rejects severity out of range", () => {
     expect(issuePaths(baseResult({ severity_score: 6 }))).toContain("severity_score");
   });
+
+  it("rejects oversized audit strings and arrays", () => {
+    const longSnippet = baseResult();
+    longSnippet.evidence_sources[0] = { ...longSnippet.evidence_sources[0]!, snippet: "x".repeat(2001) };
+    expect(issuePaths(longSnippet)).toContain("evidence_sources.0.snippet");
+
+    const tooManySources = baseResult();
+    tooManySources.evidence_sources = Array.from({ length: 21 }, () => tooManySources.evidence_sources[0]!);
+    expect(issuePaths(tooManySources)).toContain("evidence_sources");
+
+    const tooManyClaims = baseResult();
+    tooManyClaims.audit_trace.decomposed_claims = Array.from({ length: 31 }, () => tooManyClaims.audit_trace.decomposed_claims[0]!);
+    expect(issuePaths(tooManyClaims)).toContain("audit_trace.decomposed_claims");
+
+    expect(issuePaths(baseResult({ auditor: { provider: "ANTHROPIC", model: "x".repeat(101) } }))).toContain("auditor.model");
+  });
 });
 
 describe("evidence URLs", () => {

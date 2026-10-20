@@ -25,6 +25,11 @@
       "name": "SUBMIT_LIMITER",
       "namespace_id": "1501",
       "simple": { "limit": 10, "period": 60 }
+    },
+    {
+      "name": "SUBMIT_TOKEN_LIMITER",
+      "namespace_id": "1502",
+      "simple": { "limit": 10, "period": 60 }
     }
   ],
   "vars": {
