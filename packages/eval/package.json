@@ -13,7 +13,7 @@
     "@geminihall/schema": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^24",
+    "@types/node": "^26",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vitest": "^4.1.0"
