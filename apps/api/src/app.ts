@@ -18,6 +18,20 @@ const MAX_TOKEN_LENGTH = 256;
 const MAX_SUBMISSION_BODY_BYTES = 64 * 1024;
 const PAGE_SIZE = 50;
 const HEX64 = /^[0-9a-f]{64}$/;
+const SITE_URL = "https://geminihall.cc";
+
+function xmlEscape(value: string): string {
+  return value.replace(/[<>&'"]/gu, (char) => {
+    switch (char) {
+      case "<": return "&lt;";
+      case ">": return "&gt;";
+      case "&": return "&amp;";
+      case "'": return "&apos;";
+      case '"': return "&quot;";
+      default: return char;
+    }
+  });
+}
 
 type BoundedJsonResult = { kind: "ok"; value: unknown } | { kind: "invalid" } | { kind: "too_large" };
 
@@ -200,6 +214,27 @@ export function createApp(verifyAdmin: AdminVerifier, clock: () => number = Date
   );
 
   app.get("/api/health", (c) => c.json({ ok: true }));
+
+  app.get("/sitemap.xml", async (c) => {
+    const { results } = await c.env.DB.prepare(
+      "SELECT entry_id, published_at FROM public_entries WHERE publication_status = 'PUBLISHED' AND expires_at > ? ORDER BY published_at DESC LIMIT 49998",
+    )
+      .bind(nowIso())
+      .all<{ entry_id: string; published_at: string }>();
+    const urls = [
+      `<url><loc>${SITE_URL}/</loc></url>`,
+      `<url><loc>${SITE_URL}/about</loc></url>`,
+      ...results.map((entry) => {
+        const loc = xmlEscape(`${SITE_URL}/entries/${encodeURIComponent(entry.entry_id)}`);
+        const lastmod = xmlEscape(entry.published_at);
+        return `<url><loc>${loc}</loc><lastmod>${lastmod}</lastmod></url>`;
+      }),
+    ].join("");
+    return c.body(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`, 200, {
+      "Cache-Control": "public, max-age=300",
+      "Content-Type": "application/xml; charset=UTF-8",
+    });
+  });
 
   app.post("/api/submissions", async (c) => {
     const owner = await clientKeyHash(c);

@@ -1,0 +1,22 @@
+# GeminiHall
+
+> GeminiHall provides a Chrome extension that lets users audit claims in AI answers against materials retrieved in the user's browser, and a public dictionary of records reviewed by an administrator.
+
+The records describe the evidence and limits of an audit. They do not guarantee that a claim is true or false, and they are not a substitute for checking primary sources. The audit uses the user's AI account in the browser; API keys are not sent to GeminiHall. A record is published only after the user consents and an administrator reviews its evidence links and personal information.
+
+## What it does
+- Breaks claims in AI answers into smaller claims and compares them with materials retrieved during the browser audit.
+- Displays the audit result, evidence links, audit steps, limitations, and information expiry where available.
+- Publishes user-approved records after an administrator reviews the evidence and personal information.
+
+## What it is not
+- It is not an authority that guarantees the truth of an AI answer or an audit result.
+- It does not replace primary sources; readers should check the linked materials.
+- It does not send users' AI API keys to GeminiHall's server.
+
+## Key pages
+- [Public dictionary](https://geminihall.cc/): Reviewed audit records.
+- [About GeminiHall](https://geminihall.cc/about): Audit approach, publication process, and limitations.
+
+## Contact / operator
+- Site: https://geminihall.cc/

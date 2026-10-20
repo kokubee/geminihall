@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GeminiHall について | GeminiHall 公開辞典</title>
+    <meta name="description" content="GeminiHallの監査の考え方、掲載までの流れ、記録の限界を説明します。AIを正解を知る存在とみなさず、取得した資料で裏付けられない主張は判定を保留します。" />
+    <meta name="keywords" content="GeminiHall, AI回答の監査, 根拠確認, 監査記録" />
+    <link rel="canonical" href="https://geminihall.cc/about" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="GeminiHall" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:url" content="https://geminihall.cc/about" />
+    <meta property="og:title" content="GeminiHall について | GeminiHall 公開辞典" />
+    <meta property="og:description" content="GeminiHallの監査の考え方、掲載までの流れ、記録の限界を説明します。" />
+    <meta property="og:image" content="https://geminihall.cc/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="GeminiHall 公開辞典。AI回答の根拠を資料と照合する監査記録。" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GeminiHall について | GeminiHall 公開辞典" />
+    <meta name="twitter:description" content="GeminiHallの監査の考え方、掲載までの流れ、記録の限界を説明します。" />
+    <meta name="twitter:image" content="https://geminihall.cc/og-image.png" />
+    <link rel="describedby" href="/llms.txt" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://geminihall.cc/#organization",
+            "name": "GeminiHall",
+            "url": "https://geminihall.cc/",
+            "description": "利用者のブラウザで AI の主張を検索で取得した資料と照合し、管理者が根拠を確認した監査記録を掲載する公開辞典です。主張の真偽を保証するものではありません。",
+            "knowsAbout": ["AI回答の監査", "検索で取得した資料との照合", "監査記録"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://geminihall.cc/#website",
+            "name": "GeminiHall 公開辞典",
+            "url": "https://geminihall.cc/",
+            "inLanguage": "ja",
+            "publisher": { "@id": "https://geminihall.cc/#organization" }
+          },
+          {
+            "@type": "AboutPage",
+            "@id": "https://geminihall.cc/about#webpage",
+            "name": "GeminiHall について",
+            "url": "https://geminihall.cc/about",
+            "description": "GeminiHallの監査の考え方、掲載までの流れ、記録の限界を説明します。",
+            "inLanguage": "ja",
+            "isPartOf": { "@id": "https://geminihall.cc/#website" }
+          }
+        ]
+      }
+    </script>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">GeminiHall <span class="brand-sub">公開辞典</span></a>
+      <nav><a href="/about">GeminiHall について</a></nav>
+    </header>
+    <main id="app" aria-live="polite">
+      <article class="detail prose">
+        <h1>GeminiHall について</h1>
+        <p>GeminiHall は、AI の回答に含まれる主張を、検索で実際に取得した資料にもとづいて監査し、その記録を公開する取り組みです。</p>
+        <h2>監査の考え方</h2>
+        <ul>
+          <li>監査に使う AI を、正解を知っている存在として扱いません。監査中に取得した資料で裏付けられない限り、「誤り」とも「正しい」とも断定しません。</li>
+          <li>主張を小さな単位に分け、それぞれを資料と照合し、判定または判定の保留に至るまでの工程をすべて表示します。</li>
+          <li>根拠が足りない主張、意見や価値判断、未来の予測は「判定を保留」とし、その理由を示します。</li>
+          <li>情報の種類ごとに有効期限を設け、期限を過ぎた事例は再確認が必要であることを表示します。</li>
+        </ul>
+        <h2>掲載までの流れ</h2>
+        <ol>
+          <li>利用者が、Chrome 拡張機能と自分の AI の契約で監査を実行します。監査は利用者のブラウザの中だけで行われ、API キーは GeminiHall に送られません。</li>
+          <li>利用者が結果を見て、公開に同意したうえで掲載を申請します。</li>
+          <li>管理者が根拠のリンク先と個人情報の有無を確認し、公開用に文面を整えてから掲載します。</li>
+        </ol>
+        <p><a href="/" data-link="">公開辞典を見る</a></p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <p>掲載事例は、利用者が自分のAIで行った監査結果のうち、本人が公開に同意し、管理者が根拠と個人情報の有無を確認したものです。最終的な判断は、根拠のリンク先をご自身で確かめてください。</p>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

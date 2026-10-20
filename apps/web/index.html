@@ -3,8 +3,49 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GeminiHall 公開辞典</title>
-    <meta name="description" content="AIの回答に含まれる主張を、検索で取得した資料にもとづいて監査し、管理者が確認した事例を公開する辞典です。" />
+    <title>AI回答の監査記録・公開辞典 | GeminiHall</title>
+    <meta name="description" content="GeminiHall は、利用者のブラウザで AI の主張を検索で取得した資料と照合する Chrome 拡張機能と、管理者が根拠を確認した監査記録を掲載する公開辞典です。掲載記録は真偽を保証せず、一次資料の代わりにもなりません。" />
+    <meta name="keywords" content="AI回答, ファクトチェック, 根拠確認, 監査記録, 公開辞典" />
+    <meta name="application-name" content="GeminiHall" />
+    <link rel="canonical" href="https://geminihall.cc/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GeminiHall" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:url" content="https://geminihall.cc/" />
+    <meta property="og:title" content="AI回答の監査記録・公開辞典 | GeminiHall" />
+    <meta property="og:description" content="利用者のブラウザで AI の主張を検索で取得した資料と照合し、管理者が根拠を確認した記録を掲載します。" />
+    <meta property="og:image" content="https://geminihall.cc/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="GeminiHall 公開辞典。AI回答の根拠を資料と照合する監査記録。" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AI回答の監査記録・公開辞典 | GeminiHall" />
+    <meta name="twitter:description" content="利用者のブラウザで AI の主張を検索で取得した資料と照合し、管理者が根拠を確認した記録を掲載します。" />
+    <meta name="twitter:image" content="https://geminihall.cc/og-image.png" />
+    <link rel="describedby" href="/llms.txt" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://geminihall.cc/#organization",
+            "name": "GeminiHall",
+            "url": "https://geminihall.cc/",
+            "description": "利用者のブラウザで AI の主張を検索で取得した資料と照合し、管理者が根拠を確認した監査記録を掲載する公開辞典です。主張の真偽を保証するものではありません。",
+            "knowsAbout": ["AI回答の監査", "検索で取得した資料との照合", "監査記録"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://geminihall.cc/#website",
+            "name": "GeminiHall 公開辞典",
+            "url": "https://geminihall.cc/",
+            "inLanguage": "ja",
+            "publisher": { "@id": "https://geminihall.cc/#organization" }
+          }
+        ]
+      }
+    </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
@@ -13,7 +54,12 @@
       <a class="brand" href="/">GeminiHall <span class="brand-sub">公開辞典</span></a>
       <nav><a href="/about">GeminiHall について</a></nav>
     </header>
-    <main id="app" aria-live="polite"></main>
+    <main id="app" aria-live="polite">
+      <section class="intro">
+        <h1>AI の回答に含まれる主張の監査記録</h1>
+        <p>GeminiHall は、利用者が自分の AI で主張を検索で取得した資料と照合する Chrome 拡張機能と、管理者が根拠と個人情報を確認した事例を掲載する公開辞典です。掲載記録は主張の真偽を保証せず、一次資料の代わりにもなりません。</p>
+      </section>
+    </main>
     <footer class="site-footer">
       <p>掲載事例は、利用者が自分のAIで行った監査結果のうち、本人が公開に同意し、管理者が根拠と個人情報の有無を確認したものです。最終的な判断は、根拠のリンク先をご自身で確かめてください。</p>
     </footer>

@@ -57,14 +57,15 @@ describe("submissions", () => {
 
   it("returns 413 for a request body over 64 KiB", async () => {
     const body = JSON.stringify({ padding: "x".repeat(65_536) });
-    for (const headers of [
+    const headerCases: Record<string, string>[] = [
       { "content-type": "application/json", "X-Client-Token": TOKEN_A },
       {
         "content-type": "application/json",
         "X-Client-Token": TOKEN_A,
         "Content-Length": String(new TextEncoder().encode(body).byteLength),
       },
-    ]) {
+    ];
+    for (const headers of headerCases) {
       const res = await call("/api/submissions", { method: "POST", headers, body });
       expect(res.status).toBe(413);
       expect(await res.json()).toMatchObject({ error: { code: "INVALID_INPUT" } });
