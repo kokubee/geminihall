@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ADMIN_HEADER, TOKEN_A, approve, call, postJson, setNow, submit } from "./helpers";
+import { ADMIN_HEADER, TOKEN_A, app, approve, call, postJson, setNow, submit, testEnv } from "./helpers";
 
 const ADMIN = { [ADMIN_HEADER]: "admin@example.com" };
 
@@ -32,5 +32,32 @@ describe("SEO assets", () => {
     } finally {
       setNow("2026-10-15T00:00:00.000Z");
     }
+  });
+
+  it("serves the app shell only for existing entry pages and returns a noindex 404 otherwise", async () => {
+    const assets = {
+      fetch: async (request: Request) => {
+        const path = new URL(request.url).pathname;
+        return path === "/404.html"
+          ? new Response("not found page", { headers: { "Content-Type": "text/html; charset=UTF-8" } })
+          : new Response("app shell", { headers: { "Content-Type": "text/html; charset=UTF-8" } });
+      },
+    } as unknown as typeof testEnv.ASSETS;
+    const envWithAssets = { ...testEnv, ASSETS: assets };
+
+    const missing = await app.request(`/entries/${crypto.randomUUID()}`, {}, envWithAssets);
+    expect(missing.status).toBe(404);
+    expect(missing.headers.get("x-robots-tag")).toBe("noindex, follow");
+    expect(await missing.text()).toBe("not found page");
+
+    const { result } = await submit("既存の公開記録ページ", TOKEN_A);
+    const approved = (await (await approve(result.request_id)).json()) as { entry_id: string };
+    const existing = await app.request(`/entries/${approved.entry_id}`, {}, envWithAssets);
+    expect(existing.status).toBe(200);
+    expect(await existing.text()).toBe("app shell");
+
+    const existingWithSlash = await app.request(`/entries/${approved.entry_id}/`, {}, envWithAssets);
+    expect(existingWithSlash.status).toBe(200);
+    expect(await existingWithSlash.text()).toBe("app shell");
   });
 });

@@ -215,6 +215,27 @@ export function createApp(verifyAdmin: AdminVerifier, clock: () => number = Date
 
   app.get("/api/health", (c) => c.json({ ok: true }));
 
+  const renderEntryPage = async (c: Context<AppEnv>) => {
+    const id = z.string().uuid().safeParse(c.req.param("id"));
+    const entry = id.success
+      ? await c.env.DB.prepare("SELECT entry_id FROM public_entries WHERE entry_id = ?")
+          .bind(id.data)
+          .first<{ entry_id: string }>()
+      : null;
+
+    if (!entry) {
+      const asset = await c.env.ASSETS.fetch(new Request(new URL("/404.html", c.req.url)));
+      const headers = new Headers(asset.headers);
+      headers.set("X-Robots-Tag", "noindex, follow");
+      return new Response(asset.body, { status: 404, headers });
+    }
+
+    return c.env.ASSETS.fetch(new Request(new URL("/", c.req.url)));
+  };
+
+  app.get("/entries/:id", renderEntryPage);
+  app.get("/entries/:id/", renderEntryPage);
+
   app.get("/sitemap.xml", async (c) => {
     const { results } = await c.env.DB.prepare(
       "SELECT entry_id, published_at FROM public_entries WHERE publication_status = 'PUBLISHED' AND expires_at > ? ORDER BY published_at DESC LIMIT 49998",
