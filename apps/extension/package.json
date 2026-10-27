@@ -15,7 +15,7 @@
   "dependencies": {
     "@geminihall/audit-core": "workspace:*",
     "@geminihall/schema": "workspace:*",
-    "jose": "~6.2.12"
+    "jose": "~6.2.13"
   },
   "devDependencies": {
     "@types/chrome": "^0.3.5",
